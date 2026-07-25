@@ -1,0 +1,2 @@
+"use strict";
+window.ANIMUS_RELEASE_IDENTITY={"applicationName":"Animus Companion","version":"7.0.0","releaseChannel":"production","buildId":"animus-v7.0.0-20260724","buildDate":"2026-07-24","databaseVersion":9,"userDataSchemaVersion":3,"integrityManifestVersion":2,"serviceWorkerCache":"acbf-v7.0.0","copyrightOwner":"Stephen Vare","officialRepository":"m6vfjyhrwp-ctrl/Assassins-Creed-Black-Flag-Companion-Map"};

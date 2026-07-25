@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050a0b">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
+  <meta name="apple-mobile-web-app-title" content="Animus Companion">
+  <title>Animus Companion 7.0.0 — Public Release</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="bootScreen" class="boot-screen" aria-label="Loading Animus Companion">
+    <img class="branding-splash" src="./branding-splash.png" alt="Animus Companion — Assassin’s Creed IV Black Flag Resynced Edition">
+    <div class="boot-track" aria-hidden="true"><span></span></div>
+  </div>
+
+  <header class="app-header">
+    <button id="brandHome" class="brand-lockup" type="button" aria-label="Open map">
+      <img src="./man-o-war-hybrid.png" alt="Man-O-War crest">
+      <span><strong>Animus Companion</strong><small>Black Flag Resynced</small></span>
+    </button>
+    <div class="header-actions">
+      <button id="globalSearchButton" class="icon-button" type="button" aria-label="Search">⌕</button>
+      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.0.0 <small id="releaseStatusText">Integrity Not Verified</small></button>
+    </div>
+  </header>
+
+  <main>
+    <nav class="tab-bar" aria-label="Primary navigation">
+      <button class="tab active" data-tab="map">🧭<span>Map</span></button>
+      <button class="tab" data-tab="jackdaw">⛵<span>Jackdaw</span></button>
+      <button class="tab" data-tab="progress">▥<span>Progress</span></button>
+      <button class="tab" data-tab="log">📖<span>Log</span></button>
+      <button class="tab" data-tab="settings">⚙<span>Settings</span></button>
+    </nav>
+
+    <section id="mapPanel" class="app-panel active map-panel">
+      <div class="map-shell">
+        <section id="mapColumn" class="map-column panel">
+          <div class="map-topbar">
+            <div class="map-context"><b id="mapTitle">Caribbean Map</b><small id="mapContext">All visible locations</small></div>
+            <div class="map-action-row">
+              <button id="filterButton" class="icon-button" type="button" aria-label="Filters">☷</button>
+              <button id="scanButton" class="icon-button" type="button" aria-label="Animus Scan">⌁</button>
+              <button id="routeButton" class="icon-button toolbar-priority" type="button" aria-label="Route planner">⌘</button>
+              <button id="fullScreenButton" class="icon-button toolbar-priority" type="button" aria-label="Full screen map">⛶</button>
+              <button id="moreActionsButton" class="icon-button more-actions-button" type="button" aria-label="More map actions" aria-expanded="false" aria-controls="moreActionsMenu">•••</button>
+              <button id="exitFullScreenButton" class="icon-button exit-fullscreen" type="button" aria-label="Exit full screen">✕</button>
+              <div id="moreActionsMenu" class="more-actions-menu" hidden role="menu" aria-label="More map actions">
+                <button type="button" role="menuitem" data-more-action="filters">Filters</button>
+                <button type="button" role="menuitem" data-more-action="scan">Animus Scan</button>
+                <button type="button" role="menuitem" data-more-action="route">Route planner</button>
+                <button type="button" role="menuitem" data-more-action="fullscreen">Full-screen map</button>
+                <button type="button" role="menuitem" data-more-action="nearest">Nearest objective</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="activeFilterSummary" class="active-filter-summary"></div>
+
+          <section id="viewport" class="viewport" aria-label="Interactive Caribbean map">
+            <div id="stage" class="stage">
+              <img class="map-image" src="./caribbean-map.jpg" alt="Caribbean map">
+              <svg id="routeLayer" class="route-layer" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+              <div id="markerLayer" class="marker-layer"></div>
+            </div>
+            <div id="scanWave" class="scan-wave"></div>
+            <div class="map-controls">
+              <button id="nearestButton" class="nearest-control" type="button" aria-label="Find nearest visible incomplete location">◎</button>
+              <button id="zoomIn" type="button" aria-label="Zoom in">+</button>
+              <button id="zoomOut" type="button" aria-label="Zoom out">−</button>
+              <button id="reset" type="button" aria-label="Reset map">↻</button>
+            </div>
+            <button id="mapStatusButton" class="map-status-pill" type="button"><strong id="visibleCompletion">0%</strong><span id="visibleCount">0 visible</span></button>
+          </section>
+          <section id="routeSummary" class="route-summary" hidden></section>
+        </section>
+
+        <aside id="locationBrowser" class="location-browser panel">
+          <div class="browser-heading"><div><h2>Locations</h2><span id="locationCount"></span></div><button id="closeBrowser" class="icon-button browser-close" type="button">✕</button></div>
+          <label class="search-box"><span>⌕</span><input id="locationSearch" type="search" placeholder="Search locations, rewards, coordinates"></label>
+          <div class="search-controls">
+            <label class="search-scope"><input id="searchAllLocations" type="checkbox"><span>Search entire database</span></label>
+            <section class="filter-section" aria-labelledby="quickFilterHeading"><div class="filter-section-heading"><span id="quickFilterHeading">Quick filters</span><small>Swipe for more</small></div><div id="quickFilters" class="quick-filter-row"></div></section>
+            <section class="filter-section" aria-labelledby="categoryFilterHeading"><div class="filter-section-heading"><span id="categoryFilterHeading">Category</span><small>Choose one</small></div><div id="locationFilters" class="filter-row"></div></section>
+            <label class="region-filter"><span>Region</span><select id="regionFilter"></select></label>
+            <div id="islandExplorer" class="island-explorer" hidden></div>
+          </div>
+          <div id="locationDirectory" class="location-directory"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="jackdawPanel" class="app-panel content-panel">
+<section class="hero-card"><span>CAPTAIN’S EDITION</span><h2>Jackdaw & Fleet</h2><p>Track ship systems, plan upgrades, manage captured vessels, and keep naval notes entirely offline.</p></section>
+<nav class="section-tabs" aria-label="Captain tools"><button class="active" data-captain-view="ship">Jackdaw</button><button data-captain-view="fleet">Fleet</button><button data-captain-view="encyclopedia">Encyclopedia</button></nav>
+<section id="captainShipView" class="captain-view active"><section class="panel"><div id="jackdawControls" class="upgrade-grid"></div></section><section class="panel readiness"><div><span>Overall readiness</span><strong id="overallReadiness">0%</strong></div><div class="progress-track"><span id="overallReadinessBar"></span></div><p id="readinessMessage"></p><div id="upgradeSuggestions"></div><div id="nextUpgradeCard"></div></section></section>
+<section id="captainFleetView" class="captain-view"><section class="panel fleet-editor"><h2>Add fleet vessel</h2><div class="form-grid"><input id="fleetShipName" placeholder="Ship name"><select id="fleetShipClass"><option>Schooner</option><option>Brig</option><option>Frigate</option><option>Man O’ War</option></select><input id="fleetShipPower" type="number" min="1" max="100" placeholder="Power"><input id="fleetShipCargo" type="number" min="0" placeholder="Cargo"><textarea id="fleetShipNotes" placeholder="Repairs, routes, or notes"></textarea><button id="addFleetShip" class="primary">Add vessel</button></div></section><section class="panel"><div id="fleetSummary" class="metric-grid"></div><div id="fleetList"></div></section></section>
+<section id="captainEncyclopediaView" class="captain-view"><section class="panel"><label class="search-box"><span>⌕</span><input id="encyclopediaSearch" type="search" placeholder="Search ships, islands, tactics, upgrades"></label><div id="encyclopediaList"></div></section></section>
+</section>
+
+    <section id="progressPanel" class="app-panel content-panel"><section class="hero-card"><span>SYNCHRONIZATION</span><h2>World Progress</h2><p>Overall and filtered completion by category and region.</p></section><section class="panel"><div id="progressMetrics" class="metric-grid"></div></section><section class="panel"><h2>Visible-filter progress</h2><div id="visibleProgress"></div></section><section class="panel"><h2>Category progress</h2><div id="categoryProgress"></div></section><section class="panel"><h2>Region progress</h2><div id="regionProgress"></div></section><section class="panel"><h2>100% Completion Planner</h2><div class="planner-controls"><select id="plannerScope"><option value="visible">Current filters</option><option value="all">Whole database</option><option value="favorites">Favorites</option><option value="route">Current route</option></select><select id="plannerSort"><option value="nearest">Nearest</option><option value="category">Category</option><option value="region">Region</option><option value="route">Route order</option><option value="verification">Verification</option></select><button id="buildPlannerRoute" class="primary">Route remaining</button></div><div id="milestoneCards" class="milestone-grid"></div><div id="locationProgressList"></div></section></section>
+
+    <section id="logPanel" class="app-panel content-panel"><section class="hero-card"><span>EDWARD'S JOURNAL</span><h2>Captain’s Log</h2><p>Automatic completion entries plus searchable personal records.</p></section><section class="panel log-editor"><input id="logTitle" placeholder="Entry title"><textarea id="logBody" rows="4" placeholder="Record your plans, discoveries, or victories…"></textarea><button id="addLogEntry" class="primary">Add entry</button></section><section class="panel"><label class="search-box"><span>⌕</span><input id="logSearch" type="search" placeholder="Search log"></label><div id="logEntries"></div></section></section>
+
+    <section id="settingsPanel" class="app-panel content-panel"><section class="hero-card"><span>COMPANION OPTIONS</span><h2>Settings, Sessions & Backup</h2></section><section id="playSessionPanel" class="panel"></section><section id="backupCenter" class="panel"></section><section id="helpPanel" class="panel"></section><section class="panel settings-grid"><label>Play mode<select id="playMode"><option value="normal">Normal — balanced visibility</option><option value="explorer">Explorer — reduce spoilers</option><option value="completionist">Completionist — reveal stored objectives</option></select></label><p id="modeExplanation" class="mode-explanation"></p><label class="switch"><input id="reduceMotion" type="checkbox"><span>Reduce motion</span></label><label class="switch"><input id="animusMode" type="checkbox"><span>Animus visual mode</span></label><label>Marker size<select id="markerSize"><option value="small">Small</option><option value="normal">Normal</option><option value="large">Large</option></select></label><label class="switch"><input id="routeSkipCompleted" type="checkbox"><span>Skip completed route stops</span></label><label>Toast duration<input value="3 seconds (locked)" disabled></label><div id="recentSearchSettings"></div><div class="button-grid"><button id="exportBackup">Export JSON backup</button><label class="file-button">Import JSON backup<input id="importBackup" type="file" accept="application/json"></label><button id="resetProgress" class="danger">Reset progress</button><button id="resetSettings" class="danger ghost">Reset settings</button><button id="fullReset" class="danger">Full app reset</button></div><p id="settingsStatus" class="status-text" aria-live="polite"></p></section><section class="panel public-release-notice" aria-labelledby="publicReleaseHeading"><h2 id="publicReleaseHeading">Public Release & Ownership</h2><p><strong>© 2026 Stephen Vare. Original project code, interface design, database compilation, documentation, and custom project artwork are reserved as described in the repository license.</strong></p><p>Animus Companion is an unofficial, fan-made, noncommercial companion project. It is not affiliated with, endorsed by, sponsored by, or officially connected with Ubisoft. Assassin’s Creed, Assassin’s Creed IV: Black Flag, related names, characters, logos, game artwork, and trademarks belong to their respective owners.</p><p class="mode-explanation">Official releases originate from the project owner’s GitHub repository and can be checked using the built-in integrity status and published SHA-256 checksums.</p></section><section id="diagnosticsPanel" class="panel diagnostics-panel"><h2>Diagnostics & App Information</h2><div id="diagnosticsSummary" class="diagnostics-grid"></div><p class="mode-explanation">Toast duration is fixed at three seconds. Progress, notes, routes, filters, and settings stay local to this device.</p></section><section id="devPanel" class="panel" hidden><h2>Developer Mode</h2><div id="devStats"></div><button id="exportDiagnostics">Export diagnostics</button></section></section>
+  </main>
+
+  <div id="toast" class="toast" hidden aria-live="polite"></div><section id="onboarding" class="onboarding" hidden role="dialog" aria-modal="true" aria-label="Animus Companion onboarding"><div class="onboarding-card"><button id="onboardingSkip">Skip</button><div id="onboardingContent"></div><div><button id="onboardingBack">Back</button><button id="onboardingNext" class="primary">Next</button></div></div></section>
+  <div id="markerContextMenu" class="marker-context-menu" hidden aria-live="polite"></div>
+  <input id="contextScreenshotInput" type="file" accept="image/*" hidden>
+  <div id="modalBackdrop" class="modal-backdrop" hidden></div>
+
+  <aside id="filterDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-header"><div><small>MAP DATASET</small><h2>Filters</h2></div><button id="closeFilterDrawer" class="icon-button">✕</button></div>
+    <div id="drawerCategoryFilters" class="drawer-categories"></div>
+    <div class="drawer-options">
+      <label><input id="hideCompleted" type="checkbox"> Hide completed</label>
+      <label><input id="favoritesOnly" type="checkbox"> Favorites only</label>
+      <label><input id="incompleteOnly" type="checkbox"> Incomplete only</label>
+      <label><input id="discoveredOnly" type="checkbox"> Discovered only</label>
+      <label><input id="verifiedOnly" type="checkbox"> Resynced verified only</label>
+      <label><input id="legacyOnly" type="checkbox"> Legacy only</label>
+    </div>
+    <div class="drawer-footer"><button id="clearFilters">Show all</button><button id="applyFilters" class="primary">Apply</button></div>
+  </aside>
+
+  <aside id="routeDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-header"><div><small>VISIBLE DATASET ONLY</small><h2>Route Planner</h2></div><button id="closeRouteDrawer" class="icon-button">✕</button></div>
+    <label>Route source<select id="routeSource"><option value="visible-incomplete">Visible incomplete</option><option value="visible-all">All visible</option><option value="favorites">Visible favorites</option><option value="manual">Manually selected</option></select></label>
+    <label>Route strategy<select id="routeStrategy"><option value="nearest">Nearest first</option><option value="shortest">Shortest practical route</option><option value="custom">Custom/manual order</option></select></label>
+    <div class="route-drawer-actions"><button id="buildRoute" class="primary">Build route</button><button id="reverseRoute">Reverse</button><button id="clearRoute">Clear route</button></div><div class="route-drawer-actions objective-actions"><button id="openCurrentObjective">Open next objective</button><button id="chooseAnotherObjective">Choose another objective</button></div>
+    <div id="routeCandidateSummary" class="status-card"></div>
+  </aside>
+
+  <div id="sheetBackdrop" class="sheet-backdrop" hidden></div>
+  <aside id="detailSheet" class="detail-sheet" aria-hidden="true" data-size="half">
+    <button id="sheetHandle" class="sheet-handle" type="button" aria-label="Resize location details"></button>
+    <div id="detailContent"></div>
+  </aside>
+
+  <script src="./release-identity.js"></script><script src="./database.js"></script><script src="./engine.js"></script><script src="./integrity.js"></script><script src="./app.js"></script>
+</body>
+</html>

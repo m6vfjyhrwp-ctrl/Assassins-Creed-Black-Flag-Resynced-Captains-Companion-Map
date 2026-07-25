@@ -1,0 +1,11 @@
+{
+  "version": "7.0.0",
+  "name": "Public Release Security & Ownership Hardening",
+  "databaseVersion": 9,
+  "userDataVersion": 3,
+  "storageKey": "acbf-companion-m3",
+  "released": "2026-07-24",
+  "buildId": "animus-v7.0.0-20260724",
+  "releaseChannel": "production",
+  "integrityManifestVersion": 2
+}

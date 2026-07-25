@@ -1,0 +1,110 @@
+{
+  "manifestVersion": 2,
+  "releaseVersion": "7.0.0",
+  "buildId": "animus-v7.0.0-20260724",
+  "algorithm": "SHA-256",
+  "copyrightOwner": "Stephen Vare",
+  "officialRepositoryOwner": "m6vfjyhrwp-ctrl",
+  "files": [
+    {
+      "path": "index.html",
+      "size": 17775,
+      "sha256": "b54c84a9918879d4a2353b56be854579fbd5b3d217bb66818de72f5c80b8cb5b"
+    },
+    {
+      "path": "styles.css",
+      "size": 29787,
+      "sha256": "6858312c131632d7513716f1b2921ff20530642d86bb95b91be7cc868660c31c"
+    },
+    {
+      "path": "release-identity.js",
+      "size": 415,
+      "sha256": "de1d1d713195e659710d13aa2be24af264db8f4428dc2cf4048f8052ca6ebba2"
+    },
+    {
+      "path": "integrity.js",
+      "size": 1670,
+      "sha256": "76ca5ef4e2e168a0d3588a9be56e666515e5d66fa78c79363a8ca56890d1de0e"
+    },
+    {
+      "path": "engine.js",
+      "size": 8893,
+      "sha256": "37c196dfb583a64956fee77c48bcb4ce80797bcd5dcbc69ba8b3d26d52e1312a"
+    },
+    {
+      "path": "database.js",
+      "size": 224300,
+      "sha256": "d8bf2db754f068875cebbabe1b53ae9a387d7be35e7641df201f22496642ddc8"
+    },
+    {
+      "path": "app.js",
+      "size": 84896,
+      "sha256": "4553e87492d7f75b5ddedf9ff351fbfb3540a25a71fd6638ad0713b124b802af"
+    },
+    {
+      "path": "service-worker.js",
+      "size": 1872,
+      "sha256": "669893ca44b1fa00820204fae5247582c33bc361d720323ffc04c85eead1196d"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "size": 732,
+      "sha256": "47bbeed3470c1cb137c3b9a70724fe93d6ebd04acc74f8e0da6f7553eb97a11c"
+    },
+    {
+      "path": "VERSION.json",
+      "size": 303,
+      "sha256": "6df6b5ca7d6935c5404ac7b1017f67545dd9aa91eb033b1271755a3873fdd3c1"
+    },
+    {
+      "path": "release-identity.json",
+      "size": 414,
+      "sha256": "c644e57e99e124e58aa496c0a4d71cb7f0d4e4bee2a7161b3d850c858cf2c7ae"
+    },
+    {
+      "path": "caribbean-map.jpg",
+      "size": 1076786,
+      "sha256": "67b2c8c66e8b9149c028ed295beb71599850dcc19314a9a30411bd9afc51cf11"
+    },
+    {
+      "path": "man-o-war-hybrid.png",
+      "size": 267605,
+      "sha256": "571a37e22476307624acc10a1937133cb2c404a601c80f962a574c53d8705bf0"
+    },
+    {
+      "path": "branding-splash.png",
+      "size": 1133861,
+      "sha256": "0bd3584e64a19c59a9013d71fd122f7d57f2993e6fd5e00dca1d94a2d83bd50d"
+    },
+    {
+      "path": "favicon-16.png",
+      "size": 561,
+      "sha256": "4a79115da96c467b0b6fc0648697a4ec997236919421562f13c2c68ed597f84b"
+    },
+    {
+      "path": "favicon-32.png",
+      "size": 1641,
+      "sha256": "b3d75e0c358c877f9a87e3dbf7d204f2e39f0443ef8b6758413af6ee2c80c993"
+    },
+    {
+      "path": "favicon-64.png",
+      "size": 6045,
+      "sha256": "f4a09731082e9821d311e59112bc8730929b316fd57332bc076f3f997e7171b1"
+    },
+    {
+      "path": "icon-180.png",
+      "size": 44017,
+      "sha256": "dc5986a319370a8e768a2d0262c7bd7bc4d9012c7cca7e2066fd0329bfeb01ee"
+    },
+    {
+      "path": "icon-192.png",
+      "size": 49635,
+      "sha256": "faf644c4816eab618e738d2c97ed16c9623e501e80a88b7de3ed1cff00f270ca"
+    },
+    {
+      "path": "icon-512.png",
+      "size": 267605,
+      "sha256": "571a37e22476307624acc10a1937133cb2c404a601c80f962a574c53d8705bf0"
+    }
+  ]
+}
