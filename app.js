@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "6.0.3";
+  const APP_VERSION = RELEASE.version || "7.2.2";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -877,7 +877,6 @@
   $("resetProgress").onclick = () => { if (confirm("Reset location progress, notes, favorites, Jackdaw tiers and log entries? Settings and filters will remain.")) { snapshot("Before progress reset"); data.locations = {}; data.jackdaw = clone(defaults.jackdaw); data.log = []; data.route = clone(defaults.route); save(); renderAll(); } };
   $("resetSettings").onclick = () => { if (confirm("Reset play mode, filters and visual settings? Progress will remain.")) { snapshot("Before settings reset"); data.settings = clone(defaults.settings); data.filters = clone(defaults.filters); save(); renderAll(); } };
   $("fullReset").onclick = () => { if (confirm("Erase all Animus Companion data? This cannot be undone.")) { localStorage.removeItem(STORE); location.reload(); } };
-  $("versionButton").onclick = () => { if (++devTaps >= 7) { $("devPanel").hidden = !$("devPanel").hidden; devTaps = 0; toast("Developer Mode toggled"); } };
   const legacyExportDiagnostics=$("exportDiagnostics"); if(legacyExportDiagnostics) legacyExportDiagnostics.onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });

@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.2.2 — Startup escape hardening
+- Moved the startup guard into the document head so it starts before application modules.
+- Added versioned cache-busting URLs for critical HTML, CSS, JavaScript, manifest, and release assets.
+- Added a CSS-only six-second splash escape that works even if JavaScript fails.
+- Added early startup error capture for Diagnostics.
+- Corrected the release identity global alias used by application and developer-console code.
+- Removed the retired Developer Mode click handler that conflicted with the new Developer Console.
+
 ## 7.2.1 — Startup Reliability Hotfix
 
 - Fixed the startup-blocking references to retired legacy diagnostics elements.
