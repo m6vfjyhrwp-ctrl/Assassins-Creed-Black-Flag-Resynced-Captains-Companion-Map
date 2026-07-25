@@ -642,27 +642,50 @@
     $("planSession").onclick=planSession; $("startSession").onclick=()=>{data.playSession.status="active";data.playSession.startedAt ||= new Date().toISOString();data.route.ids=[...data.playSession.ids];save();renderAll();toast("Play Session started")}; $("pauseSession").onclick=()=>{data.playSession.status="paused";data.playSession.pausedAt=new Date().toISOString();save();renderPlaySession();toast("Play Session paused")}; $("finishSession").onclick=()=>{data.playSession.status="completed";save();renderPlaySession();toast("Play Session completed")}; $("clearSession").onclick=()=>{data.playSession=clone(defaults.playSession);save();renderPlaySession();toast("Session cleared")}; $("openSessionCurrent")?.addEventListener("click",()=>{switchTab("map");openLocation(current.id,true)}); document.querySelectorAll('[data-skip-session]').forEach(b=>b.onclick=()=>{data.playSession.skippedIds.push(b.dataset.skipSession);save();renderPlaySession();toast("Stop skipped")});
   }
   function renderHelp() { const host=$("helpPanel"); if(!host)return; host.innerHTML=`<h2>Help & Gestures</h2><div class="help-grid"><article><strong>Move and zoom</strong><p>Drag with one finger. Pinch with two fingers. Tap a cluster to zoom into nearby locations.</p></article><article><strong>Quick actions</strong><p>Tap a marker for details or hold it for favorite, completion, route, notes, and screenshot actions.</p></article><article><strong>Planning</strong><p>Next Objective chooses a sensible next stop. Play Session creates a short approximate route based on available time.</p></article><article><strong>Trust and backups</strong><p>Verification labels show source confidence. Export backups regularly; everything stays local.</p></article></div><button id="replayOnboarding">Replay onboarding</button>`; $("replayOnboarding").onclick=()=>showOnboarding(true); }
-  function showOnboarding(force=false) { if(data.settings.onboardingComplete&&!force)return; const modal=$("onboarding"); modal.hidden=false; let page=0; const pages=[['Move naturally','One finger pans. Two fingers pinch to zoom.'],['Find objectives','Tap markers, hold for quick actions, and tap clusters to expand them.'],['Plan your play','Use Next Objective or build a timed Play Session.'],['Protect progress','Export backups and use recovery snapshots before major changes.']]; const render=()=>{ $("onboardingContent").innerHTML=`<small>${page+1} of ${pages.length}</small><h2>${pages[page][0]}</h2><p>${pages[page][1]}</p>`; $("onboardingBack").disabled=page===0; $("onboardingNext").textContent=page===pages.length-1?'Start Exploring':'Next'; }; $("onboardingBack").onclick=()=>{page--;render()}; $("onboardingSkip").onclick=()=>{data.settings.onboardingComplete=true;save();modal.hidden=true}; $("onboardingNext").onclick=()=>{if(page===pages.length-1){data.settings.onboardingComplete=true;save();modal.hidden=true}else{page++;render()}}; render(); }
-  function addCorrectionButton() { if(!selectedId||$("reportCorrection"))return; const host=$("detailContent"); const b=document.createElement('button'); b.id='reportCorrection'; b.textContent='Report a correction'; b.onclick=()=>{const l=byId(selectedId); const note=prompt('Describe the correction or source evidence:'); if(!note)return; data.pendingCorrections.push({id:Date.now(),locationId:l.id,current:{name:l.name,type:l.type,region:l.region,coordinates:l.gameCoordinates},note,date:new Date().toISOString()});save();download(`correction-${l.id}.json`,data.pendingCorrections.at(-1));toast('Correction report saved locally')}; host.appendChild(b); }
-  const encyclopediaEntries = [
-    {id:"tactics-broadsides",category:"Naval tactics",title:"Broadside timing",body:"Expose the enemy hull, fire a full broadside, then use swivels on highlighted weak points. Keep moving to avoid becoming an easy mortar target."},
-    {id:"tactics-mortar",category:"Naval tactics",title:"Mortar engagement",body:"Open long-range encounters with mortar fire, then close only after weakening the target. Mortars are especially useful against forts and heavy ships."},
-    {id:"ship-schooner",category:"Ships",title:"Schooner",body:"Fast and lightly armed. Useful early for boarding practice and adding low-risk vessels to Kenway’s Fleet."},
-    {id:"ship-brig",category:"Ships",title:"Brig",body:"Balanced speed, armor, and cargo. A practical mid-tier fleet vessel and common naval target."},
-    {id:"ship-frigate",category:"Ships",title:"Frigate",body:"Heavy firepower with better durability. Approach prepared and disable rather than sink when capturing for the fleet."},
-    {id:"ship-manowar",category:"Ships",title:"Man O’ War",body:"A slow but heavily armed capital ship. Use the Jackdaw’s mobility, mortars, and blind-side positioning before boarding."},
-    {id:"upgrade-hull",category:"Upgrades",title:"Hull armor",body:"Improves survivability and is a core recommendation before forts, legendary ships, and high-level naval zones."},
-    {id:"upgrade-heavy",category:"Upgrades",title:"Heavy shot",body:"A close-range damage option. Upgrade recommendations are linked to stored elite-plan and encounter records when available."},
-    {id:"mechanic-coordinates",category:"Gameplay mechanics",title:"In-game coordinates",body:"The companion uses the game’s calibrated map coordinate system. Device GPS is not used as the player’s in-game position."},
-    {id:"mechanic-verification",category:"Gameplay mechanics",title:"Verification labels",body:"Resynced verified means specifically confirmed for the target edition. Legacy records remain explicitly marked until reconfirmed."}
-  ];
-  function renderFleet(){
-    const list=data.fleet||[], power=list.reduce((s,x)=>s+Number(x.power||0),0), cargo=list.reduce((s,x)=>s+Number(x.cargo||0),0);
-    $("fleetSummary").innerHTML=`<div class="metric"><span>Vessels</span><strong>${list.length}</strong></div><div class="metric"><span>Total power</span><strong>${power}</strong></div><div class="metric"><span>Total cargo</span><strong>${cargo}</strong></div><div class="metric"><span>Repair needed</span><strong>${list.filter(x=>x.status==="repair").length}</strong></div>`;
-    $("fleetList").innerHTML=list.length?list.map(ship=>`<article class="fleet-card"><header><div><strong>${esc(ship.name)}</strong><small>${esc(ship.className)} • Power ${Number(ship.power||0)} • Cargo ${Number(ship.cargo||0)}</small></div><span>${ship.status==="repair"?"Needs repair":"Ready"}</span></header><p>${esc(ship.notes||"No notes")}</p><div class="fleet-actions"><button data-fleet-status="${ship.id}">${ship.status==="repair"?"Mark repaired":"Needs repair"}</button><button data-fleet-profit="${ship.id}">Add profit</button><button data-fleet-delete="${ship.id}" class="danger">Remove</button></div><small>Recorded profit: ${Number(ship.profit||0)}</small></article>`).join(""):`<p class="empty-state">No captured vessels recorded yet.</p>`;
-    document.querySelectorAll('[data-fleet-status]').forEach(b=>b.onclick=()=>{const x=list.find(s=>String(s.id)===b.dataset.fleetStatus);x.status=x.status==="repair"?"ready":"repair";save();renderFleet()});
-    document.querySelectorAll('[data-fleet-profit]').forEach(b=>b.onclick=()=>{const x=list.find(s=>String(s.id)===b.dataset.fleetProfit),v=Number(prompt('Add profit amount:',0));if(Number.isFinite(v)){x.profit=Number(x.profit||0)+v;save();renderFleet();toast('Fleet profit updated')}});
-    document.querySelectorAll('[data-fleet-delete]').forEach(b=>b.onclick=()=>{if(confirm('Remove this vessel from the local fleet tracker?')){data.fleet=list.filter(s=>String(s.id)!==b.dataset.fleetDelete);save();renderFleet()}});
+  function showOnboarding(force=false) {
+    if(data.settings.onboardingComplete&&!force)return;
+    const modal=$("onboarding");
+    if(!modal)return;
+    const previouslyFocused=document.activeElement;
+    let page=0;
+    const pages=[
+      {kicker:"WELCOME ABOARD",title:"Your Black Flag companion",description:"Animus Companion is an unofficial, offline-first guide for exploring the Caribbean, tracking progress, planning routes, and keeping your captain’s records together.",features:[["🧭","Interactive map","Search, filter, open, favorite, and complete stored objectives."],["⛵","Jackdaw planning","Track ship upgrades and plan what to improve next."],["📖","Progress and log","Review completion totals and keep personal notes on this device."]]},
+      {kicker:"MAP CONTROLS",title:"Move naturally",description:"Use familiar mobile gestures to explore without fighting the interface.",features:[["☝️","Pan","Move across the map with one finger."],["🤏","Zoom","Pinch with two fingers; tap clusters to inspect dense areas."],["📍","Open and act","Tap a marker for details or press and hold for quick actions."]]},
+      {kicker:"PLAN YOUR PLAY",title:"Find the next objective",description:"Use the app’s planning tools to turn a large map into a practical play session.",features:[["⌕","Search and filters","Show only the objective types, regions, or verification levels you need."],["🧭","Next Objective","Jump to a sensible incomplete objective based on your current context."],["↝","Routes and sessions","Build a route or a timed Play Session and resume it later."]]},
+      {kicker:"YOUR DATA",title:"Progress stays with you",description:"Completion, routes, notes, favorites, filters, and settings are stored locally on this device.",features:[["💾","Export backups","Create a JSON backup before changing devices or resetting the app."],["📴","Works offline","After the first successful load, the installed companion can launch without a connection."],["⚙️","Replay anytime","Open Settings → Help & Gestures to replay this walkthrough."]]}
+    ];
+    const close=(complete=true)=>{
+      if(complete){data.settings.onboardingComplete=true;save();}
+      modal.hidden=true;
+      document.body.classList.remove("onboarding-open");
+      document.removeEventListener("keydown",onKeydown);
+      if(previouslyFocused&&previouslyFocused.focus)previouslyFocused.focus({preventScroll:true});
+    };
+    const render=()=>{
+      const current=pages[page];
+      $("onboardingContent").innerHTML=`<small class="onboarding-kicker">${current.kicker}</small><h2 id="onboardingTitle">${current.title}</h2><p id="onboardingDescription">${current.description}</p><div class="onboarding-feature-list">${current.features.map(feature=>`<div class="onboarding-feature"><span aria-hidden="true">${feature[0]}</span><span><strong>${feature[1]}</strong><small>${feature[2]}</small></span></div>`).join("")}</div>`;
+      $("onboardingProgress").innerHTML=pages.map((_,index)=>`<span class="${index===page?'active':''}"></span>`).join("");
+      $("onboardingBack").disabled=page===0;
+      $("onboardingNext").textContent=page===pages.length-1?'Start Exploring':'Next';
+    };
+    const focusable=()=>[...modal.querySelectorAll('button:not([disabled])')];
+    const onKeydown=event=>{
+      if(event.key==='Escape'){close(true);return;}
+      if(event.key==='Tab'){
+        const items=focusable(); if(!items.length)return;
+        const first=items[0],last=items[items.length-1];
+        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      }
+    };
+    $("onboardingBack").onclick=()=>{if(page>0){page--;render();}};
+    $("onboardingSkip").onclick=()=>close(true);
+    $("onboardingNext").onclick=()=>{if(page===pages.length-1)close(true);else{page++;render();}};
+    modal.hidden=false;
+    document.body.classList.add("onboarding-open");
+    document.addEventListener("keydown",onKeydown);
+    render();
+    requestAnimationFrame(()=>$("onboardingNext").focus({preventScroll:true}));
   }
   function renderEncyclopedia(){const q=String($("encyclopediaSearch")?.value||"").toLowerCase();const rows=encyclopediaEntries.filter(e=>!q||`${e.title} ${e.category} ${e.body}`.toLowerCase().includes(q));$("encyclopediaList").innerHTML=rows.map(e=>`<article class="encyclopedia-card"><header><div><small>${esc(e.category)}</small><strong>${esc(e.title)}</strong></div><button data-bookmark="${e.id}" aria-label="Bookmark ${esc(e.title)}">${data.encyclopediaBookmarks.includes(e.id)?"★":"☆"}</button></header><p>${esc(e.body)}</p></article>`).join('')||'<p class="empty-state">No matching encyclopedia entries.</p>';document.querySelectorAll('[data-bookmark]').forEach(b=>b.onclick=()=>{const id=b.dataset.bookmark;data.encyclopediaBookmarks=data.encyclopediaBookmarks.includes(id)?data.encyclopediaBookmarks.filter(x=>x!==id):[...data.encyclopediaBookmarks,id];save();renderEncyclopedia()})}
   function renderNextUpgrade(){const missing=systems.map(s=>({s,t:Number(data.jackdaw[s.id]||0)})).filter(x=>x.t<(x.s.max||5)).sort((a,b)=>a.t-b.t)[0];$("nextUpgradeCard").innerHTML=missing?`<article class="next-upgrade-card"><small>RECOMMENDED NEXT UPGRADE</small><h3>${esc(missing.s.name)} — Tier ${missing.t+1}</h3><p>Suggested because it is among your lowest current ship systems. Exact costs and benefits are not claimed unless stored in verified location data.</p></article>`:'<p class="empty-state">Every tracked Jackdaw system is at maximum tier.</p>'}

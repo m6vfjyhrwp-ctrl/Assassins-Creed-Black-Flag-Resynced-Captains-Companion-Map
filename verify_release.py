@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import hashlib, json, pathlib, sys, zipfile
-ROOT=pathlib.Path(__file__).resolve().parents[1]
+ROOT=pathlib.Path(__file__).resolve().parent
 errors=[]
 def digest(path):
     h=hashlib.sha256()

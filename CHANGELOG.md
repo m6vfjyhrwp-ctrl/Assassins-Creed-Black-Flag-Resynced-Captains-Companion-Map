@@ -23,3 +23,15 @@
 - Preserved the 104-record database, marker IDs, calibration, interface, branding, routes, and storage schema.
 - Added guarded local-storage persistence so storage failures do not interrupt application interaction.
 - Consolidated production release identity, service-worker cache identity, integrity records, and release-candidate packaging.
+
+## 7.1.0 — Developer Console & Maintenance Hardening
+- Added hidden seven-tap local Developer Console with salted PIN hash.
+- Added read-only system, database, storage, and runtime-log inspection.
+- Added database validation, diagnostic export, safety backup, cache cleanup, service-worker update check, protected maintenance mode, and confirmed local reset.
+- Developer sessions auto-lock after 30 minutes of inactivity and contain no remote credentials or private signing keys.
+
+## 7.2.0 — First-Launch Walkthrough & Mobile Overlay Repair
+- Rebuilt onboarding as a true top-level modal above the header, map, drawers, and fixed bottom navigation.
+- Added safe-area-aware sizing, internal scrolling, focus containment, keyboard handling, and small-screen adaptations.
+- Expanded onboarding into a four-step introduction covering the app purpose, map gestures, planning tools, local storage, backups, offline use, and replay access.
+- Preserved Developer Console v1, all 104 records, marker IDs, routes, progress, calibration, database version 9, user-data schema 3, and storage-key compatibility.

@@ -29,3 +29,6 @@ Review `LICENSE`, `NOTICE.md`, `COPYRIGHT.md`, `SECURITY.md`, `SIGNING.md`, and 
 ## Fan-project disclaimer
 
 Animus Companion is not affiliated with, endorsed by, sponsored by, or officially connected with Ubisoft. Assassin’s Creed, Assassin’s Creed IV: Black Flag, related names, characters, logos, game artwork, and trademarks belong to their respective owners.
+
+## Owner maintenance console
+The local Developer Console is intentionally hidden from ordinary users. The project owner can open Settings, then tap the version button seven times within four seconds. The first unlock creates a device-local PIN. The console is read-only by default and automatically locks after 30 minutes of inactivity. Because this is a static public application, the mechanism is a safety barrier rather than secrecy or remote authentication.
