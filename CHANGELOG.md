@@ -1,5 +1,13 @@
 # Changelog
 
+## 7.2.1 — Startup Reliability Hotfix
+
+- Fixed the startup-blocking references to retired legacy diagnostics elements.
+- Preserved the v7.2 Developer Console and first-launch walkthrough.
+- Added an independent startup guard that dismisses the splash after a bounded timeout if an optional module fails.
+- Added a visible recovery notice instead of leaving users trapped on the loading screen.
+- Added `startup-guard.js` to offline caching and integrity verification.
+
 ## 7.0.0 — Public Release Security & Ownership Hardening
 
 - Established the production repository as the sole authoritative release source.

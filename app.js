@@ -700,7 +700,7 @@
     renderBackupCenter(); renderPlaySession(); renderHelp();
     const diagnosticValues={"App version":APP_VERSION,"Database version":window.ACBF_DATABASE_VERSION||"unknown","User-data schema":data.version,"Records":locations.length,"Saved states":Object.keys(data.locations).length,"Route stops":data.route.ids.length,"Build ID":RELEASE.buildId||"unknown","Release channel":RELEASE.releaseChannel||"unknown","Integrity":window.ANIMUS_INTEGRITY?.status||"Integrity Not Verified","Cache":RELEASE.serviceWorkerCache||"unknown","Recent searches":(data.settings.recentSearches||[]).length};
     $("diagnosticsSummary").innerHTML=Object.entries(diagnosticValues).map(([key,value])=>`<div><strong>${esc(value)}</strong><span>${esc(key)}</span></div>`).join("");
-    $("devStats").innerHTML=Object.entries(diagnosticValues).map(([key,value])=>`<p>${esc(key)}: ${esc(value)}</p>`).join("");
+    const legacyDevStats=$("devStats"); if(legacyDevStats) legacyDevStats.innerHTML=Object.entries(diagnosticValues).map(([key,value])=>`<p>${esc(key)}: ${esc(value)}</p>`).join("");
   }
 
   function renderFilterState() {
@@ -878,12 +878,13 @@
   $("resetSettings").onclick = () => { if (confirm("Reset play mode, filters and visual settings? Progress will remain.")) { snapshot("Before settings reset"); data.settings = clone(defaults.settings); data.filters = clone(defaults.filters); save(); renderAll(); } };
   $("fullReset").onclick = () => { if (confirm("Erase all Animus Companion data? This cannot be undone.")) { localStorage.removeItem(STORE); location.reload(); } };
   $("versionButton").onclick = () => { if (++devTaps >= 7) { $("devPanel").hidden = !$("devPanel").hidden; devTaps = 0; toast("Developer Mode toggled"); } };
-  $("exportDiagnostics").onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
+  const legacyExportDiagnostics=$("exportDiagnostics"); if(legacyExportDiagnostics) legacyExportDiagnostics.onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
   window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
   $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
-  setTimeout(() => $("bootScreen")?.classList.add("hide"), 650); setTimeout(() => $("bootScreen")?.remove(), 1150);
+  window.dispatchEvent(new CustomEvent("animus:app-ready"));
+  setTimeout(() => $("bootScreen")?.classList.add("hide"), 350); setTimeout(() => $("bootScreen")?.remove(), 850);
   if ("serviceWorker" in navigator) window.addEventListener("load", async () => {
     try {
       const registration = await navigator.serviceWorker.register("./service-worker.js");
