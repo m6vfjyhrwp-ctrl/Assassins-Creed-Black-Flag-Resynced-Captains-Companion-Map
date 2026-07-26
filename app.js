@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.3.5";
+  const APP_VERSION = RELEASE.version || "7.4.1";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -38,12 +38,19 @@
       if (!raw) return clone(defaults);
       const saved = JSON.parse(raw);
       delete saved.encyclopediaBookmarks;
+      saved.jackdaw ||= {};
+      if (saved.jackdaw.crewQuarters == null && saved.jackdaw.cargo != null) saved.jackdaw.crewQuarters = saved.jackdaw.cargo;
+      delete saved.jackdaw.cargo;
+      const normalizedJackdaw = Object.fromEntries(systems.map(system => {
+        const value = Number(saved.jackdaw[system.id] ?? 0);
+        return [system.id, Math.max(0, Math.min(system.max, Number.isFinite(value) ? value : 0))];
+      }));
       return {
         ...clone(defaults), ...saved,
         settings: { ...defaults.settings, ...(saved.settings || {}) },
         filters: { ...defaults.filters, ...(saved.filters || {}) },
         locations: saved.locations || {},
-        jackdaw: { ...defaults.jackdaw, ...(saved.jackdaw || {}) },
+        jackdaw: normalizedJackdaw,
         log: Array.isArray(saved.log) ? saved.log : [],
         fleet: Array.isArray(saved.fleet) ? saved.fleet : [],
         route: { ...defaults.route, ...(saved.route || {}), ids: Array.isArray(saved.route?.ids) ? saved.route.ids.filter(byId) : [], manualIds: Array.isArray(saved.route?.manualIds) ? saved.route.manualIds.filter(byId) : [] },
@@ -561,7 +568,13 @@
   }
 
   function renderJackdaw() {
-    $("jackdawControls").innerHTML = systems.map(system => `<label class="upgrade-control"><span>${esc(system.name)}</span><select data-system="${system.id}">${Array.from({ length: (system.max || 5) + 1 }, (_, tier) => `<option value="${tier}" ${Number(data.jackdaw[system.id]) === tier ? "selected" : ""}>Tier ${tier}</option>`).join("")}</select></label>`).join("");
+    $("jackdawControls").innerHTML = systems.map(system => {
+      const options = Array.from({ length: system.max + 1 }, (_, tier) => {
+        const optionLabel = system.binaryLabels?.[tier] || `Tier ${tier}`;
+        return `<option value="${tier}" ${Number(data.jackdaw[system.id]) === tier ? "selected" : ""}>${esc(optionLabel)}</option>`;
+      }).join("");
+      return `<label class="upgrade-control"><span>${esc(system.name)}</span><select data-system="${system.id}">${options}</select></label>`;
+    }).join("");
     document.querySelectorAll("[data-system]").forEach(select => select.onchange = event => { data.jackdaw[event.target.dataset.system] = Number(event.target.value); save(); renderJackdaw(); });
     const score = readiness();
     $("overallReadiness").textContent = `${score}%`; setDynamicStyle($("overallReadinessBar"), { width: `${score}%` });

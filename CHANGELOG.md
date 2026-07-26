@@ -1,3 +1,15 @@
+# Changelog
+
+## 7.4.1 — Jackdaw Accuracy and Full-Map Navigation
+
+- Corrected Jackdaw upgrade limits for broadside cannons, heavy shot, chain shot/bow chaser, mortars, swivels, fire barrels, ram, crew quarters, harpoon strength, and diving bell.
+- Renamed Cargo Capacity to Crew Quarters while migrating existing saved cargo values automatically.
+- Added Rowboat Armor and Harpoon Storage tracking, both with three upgrade tiers.
+- Changed Diving Bell control to Unequipped/Equipped.
+- Changed the default map camera to fit the complete Caribbean source map without stretching.
+- Enabled bounded panning on both horizontal and vertical axes, including a small navigation margin at overview scale.
+- Preserved the existing storage key, database location IDs, routes, progress, notes, and backups.
+
 # Animus Companion Changelog
 
 ## 7.4.0 — Apple Maps Experience

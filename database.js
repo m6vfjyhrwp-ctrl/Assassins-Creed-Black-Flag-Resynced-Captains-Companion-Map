@@ -21,66 +21,20 @@ window.ACBF_SOURCE_REGISTRY={
   "gamesradar-exotic-shells-2026": {"basis":"Cross-Verified Community References","title":"Exotic Sea Shells Location","url":"https://www.gamesradar.com/games/assassin-s-creed/","reviewed":"2026-07-24"}
 };
 window.ACBF_JACKDAW_SYSTEMS=[
-  {
-    "id": "hull",
-    "name": "Hull Armor",
-    "max": 5
-  },
-  {
-    "id": "broadside",
-    "name": "Broadside Cannons",
-    "max": 5
-  },
-  {
-    "id": "heavyShot",
-    "name": "Heavy Shot",
-    "max": 5
-  },
-  {
-    "id": "roundShot",
-    "name": "Round Shot",
-    "max": 5
-  },
-  {
-    "id": "chainShot",
-    "name": "Chain Shot",
-    "max": 5
-  },
-  {
-    "id": "mortar",
-    "name": "Mortars",
-    "max": 5
-  },
-  {
-    "id": "swivel",
-    "name": "Swivel Guns",
-    "max": 5
-  },
-  {
-    "id": "fireBarrels",
-    "name": "Fire Barrels",
-    "max": 5
-  },
-  {
-    "id": "ram",
-    "name": "Ram",
-    "max": 5
-  },
-  {
-    "id": "cargo",
-    "name": "Cargo Capacity",
-    "max": 5
-  },
-  {
-    "id": "harpoon",
-    "name": "Harpoon Strength",
-    "max": 5
-  },
-  {
-    "id": "divingBell",
-    "name": "Diving Bell",
-    "max": 1
-  }
+  {"id":"hull","name":"Hull Armor","max":5},
+  {"id":"broadside","name":"Broadside Cannons","max":7},
+  {"id":"heavyShot","name":"Heavy Shot","max":3},
+  {"id":"roundShot","name":"Round Shot","max":5},
+  {"id":"chainShot","name":"Chain Shot / Bow Chaser","max":3},
+  {"id":"mortar","name":"Mortars","max":4},
+  {"id":"swivel","name":"Swivel Guns","max":4},
+  {"id":"fireBarrels","name":"Fire Barrels","max":3},
+  {"id":"ram","name":"Ram","max":4},
+  {"id":"crewQuarters","name":"Crew Quarters","max":3,"legacyId":"cargo"},
+  {"id":"divingBell","name":"Diving Bell","max":1,"binaryLabels":["Unequipped","Equipped"]},
+  {"id":"harpoon","name":"Harpoon Strength","max":3},
+  {"id":"rowboatArmor","name":"Rowboat Armor","max":3},
+  {"id":"harpoonStorage","name":"Harpoon Storage","max":3}
 ];
 window.ACBF_LOCATIONS=[
   {

@@ -377,7 +377,7 @@ body.onboarding-open{overflow:hidden;touch-action:none}
 [data-progress="100"]{width:100%}
 
 
-/* v7.4.0 — Apple Maps Experience */
+/* v7.4.1 — Apple Maps Experience */
 :root{--floating-surface:rgba(5,12,14,.82);--floating-border:rgba(172,203,203,.24)}
 .app-header{position:fixed;left:0;right:0;top:0;z-index:70;background:linear-gradient(180deg,rgba(2,7,8,.96),rgba(2,7,8,.72) 72%,transparent);border-bottom:0;backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)}
 main{padding-top:calc(62px + var(--safe-top));}

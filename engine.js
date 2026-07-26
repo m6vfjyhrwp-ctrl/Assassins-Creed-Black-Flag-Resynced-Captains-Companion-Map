@@ -1,5 +1,5 @@
 "use strict";
-/** Animus Map Engine 4.0 — immersive cover framing, bounded pan, and anchored pinch zoom. */
+/** Animus Map Engine 4.1 — full-map fit, two-axis bounded pan, and anchored pinch zoom. */
 (() => {
   const viewport = document.getElementById("viewport");
   const stage = document.getElementById("stage");
@@ -27,14 +27,14 @@
     const oldCenterX = ((vw / 2 - state.x) / state.scale) / oldWidth;
     const oldCenterY = ((vh / 2 - state.y) / state.scale) / oldHeight;
 
-    // Apple Maps-style framing: preserve the source ratio while filling the viewport.
-    // This intentionally crops only outer map edges instead of introducing empty letterbox bands.
+    // Fit the complete source map inside the viewport without distortion.
+    // Zooming then expands from this full-map overview, enabling useful pan on both axes.
     if (vw / vh > MAP_ASPECT) {
-      state.baseWidth = vw;
-      state.baseHeight = vw / MAP_ASPECT;
-    } else {
       state.baseHeight = vh;
       state.baseWidth = vh * MAP_ASPECT;
+    } else {
+      state.baseWidth = vw;
+      state.baseHeight = vw / MAP_ASPECT;
     }
     setDynamicStyle(stage, { width: `${state.baseWidth}px`, height: `${state.baseHeight}px` });
 
@@ -51,11 +51,15 @@
     const renderedHeight = state.baseHeight * state.scale;
     const centeredX = (vw - renderedWidth) / 2;
     const centeredY = (vh - renderedHeight) / 2;
+    // A small navigation margin keeps two-axis panning available even at the overview scale.
+    // The map remains bounded so it cannot be lost off-screen.
+    const panMarginX = Math.min(vw * 0.08, 42);
+    const panMarginY = Math.min(vh * 0.08, 42);
     return {
-      minX: renderedWidth <= vw ? centeredX : vw - renderedWidth,
-      maxX: renderedWidth <= vw ? centeredX : 0,
-      minY: renderedHeight <= vh ? centeredY : vh - renderedHeight,
-      maxY: renderedHeight <= vh ? centeredY : 0
+      minX: renderedWidth <= vw ? centeredX - panMarginX : vw - renderedWidth,
+      maxX: renderedWidth <= vw ? centeredX + panMarginX : 0,
+      minY: renderedHeight <= vh ? centeredY - panMarginY : vh - renderedHeight,
+      maxY: renderedHeight <= vh ? centeredY + panMarginY : 0
     };
   }
 
