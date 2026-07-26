@@ -1,5 +1,5 @@
 "use strict";
-/** Animus Map Engine 3.2 — aspect-correct map framing, bounded pan, and anchored pinch zoom. */
+/** Animus Map Engine 4.0 — immersive cover framing, bounded pan, and anchored pinch zoom. */
 (() => {
   const viewport = document.getElementById("viewport");
   const stage = document.getElementById("stage");
@@ -27,12 +27,14 @@
     const oldCenterX = ((vw / 2 - state.x) / state.scale) / oldWidth;
     const oldCenterY = ((vh / 2 - state.y) / state.scale) / oldHeight;
 
+    // Apple Maps-style framing: preserve the source ratio while filling the viewport.
+    // This intentionally crops only outer map edges instead of introducing empty letterbox bands.
     if (vw / vh > MAP_ASPECT) {
-      state.baseHeight = vh;
-      state.baseWidth = vh * MAP_ASPECT;
-    } else {
       state.baseWidth = vw;
       state.baseHeight = vw / MAP_ASPECT;
+    } else {
+      state.baseHeight = vh;
+      state.baseWidth = vh * MAP_ASPECT;
     }
     setDynamicStyle(stage, { width: `${state.baseWidth}px`, height: `${state.baseHeight}px` });
 
@@ -136,8 +138,8 @@
     state.velocityY = 0;
     measure(false);
     const b = bounds();
-    state.x = b.minX;
-    state.y = b.minY;
+    state.x = (b.minX + b.maxX) / 2;
+    state.y = (b.minY + b.maxY) / 2;
     draw();
     window.dispatchEvent(new CustomEvent("acbf:map-reset"));
   }

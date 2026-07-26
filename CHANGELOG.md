@@ -1,3 +1,15 @@
+# Animus Companion Changelog
+
+## 7.4.0 — Apple Maps Experience
+
+- Rebuilt the mobile map as an immersive, map-first surface that extends beneath the floating header and above the bottom navigation.
+- Replaced letterboxed fit framing with aspect-correct cover framing so the Caribbean fills the available screen without stretching.
+- Centered reset framing and retained bounded panning, anchored pinch zoom, and coordinate alignment.
+- Converted the map toolbar into a translucent floating control surface and reduced surrounding card chrome.
+- Kept location details as an Apple Maps-style bottom sheet layered above the map.
+- Reduced initial marker clutter through smarter low-zoom clustering and more compact marker geometry.
+- Preserved all existing data, routes, filters, progress, backup compatibility, and map coordinates.
+
 # Changelog
 
 ## 7.3.5 — Map Framing & Coordinate Integrity

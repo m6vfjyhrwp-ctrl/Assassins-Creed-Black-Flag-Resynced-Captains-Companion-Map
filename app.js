@@ -193,7 +193,7 @@
     const height = Math.max(320, viewport?.clientHeight || 320);
 
     if (scale < 1.9 && list.length >= 18) {
-      const cellSize = scale < 1.25 ? 9.5 : 6.5;
+      const cellSize = scale < 1.25 ? 11.5 : 7.8;
       const buckets = new Map();
       list.forEach(location => {
         const key = `${Math.floor(location.mapPosition.x / cellSize)}:${Math.floor(location.mapPosition.y / cellSize)}`;
@@ -206,7 +206,7 @@
     }
 
     // At closer zoom levels, nearby pins are visually spread without changing stored coordinates.
-    const thresholdPx = scale >= 4 ? 34 : scale >= 2.8 ? 42 : 48;
+    const thresholdPx = scale >= 4 ? 32 : scale >= 2.8 ? 38 : 44;
     const remaining = [...list];
     const groups = [];
     while (remaining.length) {
@@ -223,7 +223,7 @@
 
     return groups.flatMap(group => {
       if (group.length === 1) return [{ kind: "location", location: group[0], x: group[0].mapPosition.x, y: group[0].mapPosition.y }];
-      const radiusPx = Math.min(58, 23 + group.length * 3.4);
+      const radiusPx = Math.min(52, 21 + group.length * 3.0);
       return group.map((location, index) => {
         const angle = -Math.PI / 2 + index * (Math.PI * 2 / group.length);
         const ring = group.length > 8 && index >= 8 ? 1.55 : 1;
