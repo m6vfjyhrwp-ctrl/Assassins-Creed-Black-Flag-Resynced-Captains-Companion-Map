@@ -1,11 +1,17 @@
+## 7.3.4 — CSP Hardening and Regression Expansion
+- Removed runtime inline style attributes in favor of CSP-safe stylesheet rules.
+- Added post-render CSP and uncaught-error regression checks.
+- Removed obsolete Encyclopedia bookmark data from loaded and imported saves.
+- Separated current-session diagnostics from historical logs.
+
 # Changelog
 
-## 7.3.3 — Encyclopedia Removal & Regression Guard (2026-07-26)
+## 7.3.4 — Encyclopedia Removal & Regression Guard (2026-07-26)
 
 - Removed the incomplete Encyclopedia tab, renderer, search controls, bookmark state, and all startup render references.
 - Added a startup regression suite covering required application functions, core data globals, and critical DOM surfaces.
 - Publishes regression results through `window.ANIMUS_REGRESSION_STATUS` and the `animus:regression-complete` event.
-- Synchronized HTML asset versions, release identity, service-worker cache, and integrity metadata to 7.3.3.
+- Synchronized HTML asset versions, release identity, service-worker cache, and integrity metadata to 7.3.4.
 
 ## 7.3.2 — Regression Repair (2026-07-26)
 

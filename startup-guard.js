@@ -29,6 +29,33 @@
   };
 
   window.addEventListener("error", event => record("error", event.error?.stack || event.message), true);
+  window.addEventListener("securitypolicyviolation", event => record("csp", `${event.violatedDirective || "policy"}: ${event.blockedURI || "unknown"}`), true);
+
+  // Apply runtime geometry through the trusted same-origin stylesheet instead of
+  // style attributes, which are forbidden by the production CSP.
+  let dynamicSequence = 0;
+  const dynamicRules = new Map();
+  const stylesheet = () => [...document.styleSheets].find(sheet => {
+    try { return sheet.href?.includes("styles.css") && !!sheet.cssRules; } catch (_) { return false; }
+  });
+  window.ANIMUS_SET_DYNAMIC_STYLE = (element, declarations = {}) => {
+    if (!element) return false;
+    const id = element.dataset.animusDynamicStyle || `d${++dynamicSequence}`;
+    element.dataset.animusDynamicStyle = id;
+    const selector = `[data-animus-dynamic-style="${id}"]`;
+    const body = Object.entries(declarations).map(([property, value]) => `${property}:${value}`).join(";");
+    const sheet = stylesheet();
+    if (!sheet) return false;
+    try {
+      const index = sheet.cssRules.length;
+      sheet.insertRule(`${selector}{${body}}`, index);
+      dynamicRules.set(id, index);
+      return true;
+    } catch (error) {
+      record("dynamic-style", error.message || error);
+      return false;
+    }
+  };
   window.addEventListener("unhandledrejection", event => record("unhandledrejection", event.reason?.stack || event.reason));
   window.addEventListener("animus:app-ready", () => {
     ready = true;

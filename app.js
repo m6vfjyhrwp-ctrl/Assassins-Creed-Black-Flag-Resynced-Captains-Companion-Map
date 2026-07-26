@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.3.3";
+  const APP_VERSION = RELEASE.version || "7.3.4";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -30,12 +30,14 @@
   const label = value => String(value || "").replaceAll("-", " ").replace(/\b\w/g, c => c.toUpperCase());
   const byId = id => locations.find(location => location.id === id);
   const unique = list => [...new Set(list)];
+  const setDynamicStyle = (element, declarations) => window.ANIMUS_SET_DYNAMIC_STYLE?.(element, declarations);
 
   function safeLoad() {
     try {
       const raw = localStorage.getItem(STORE);
       if (!raw) return clone(defaults);
       const saved = JSON.parse(raw);
+      delete saved.encyclopediaBookmarks;
       return {
         ...clone(defaults), ...saved,
         settings: { ...defaults.settings, ...(saved.settings || {}) },
@@ -245,7 +247,7 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "marker cluster";
-        button.style.left = `${item.x}%`; button.style.top = `${item.y}%`;
+        setDynamicStyle(button, { left: `${item.x}%`, top: `${item.y}%` });
         button.textContent = item.group.length;
         button.setAttribute("aria-label", `${item.group.length} nearby locations`);
         button.onclick = event => {
@@ -261,7 +263,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = markerClass(location) + (routeIndex.has(location.id) ? " route-stop" : "");
-      button.style.left = `${item.x ?? location.mapPosition.x}%`; button.style.top = `${item.y ?? location.mapPosition.y}%`;
+      setDynamicStyle(button, { left: `${item.x ?? location.mapPosition.x}%`, top: `${item.y ?? location.mapPosition.y}%` });
       if (item.displaced) button.classList.add("spread-marker");
       button.dataset.id = location.id;
       if (routeIndex.has(location.id)) button.dataset.routeOrder = routeIndex.get(location.id);
@@ -305,8 +307,7 @@
     menu.hidden = false;
     const pad = 12;
     const rect = menu.getBoundingClientRect();
-    menu.style.left = `${Math.max(pad, Math.min(window.innerWidth - rect.width - pad, clientX - rect.width / 2))}px`;
-    menu.style.top = `${Math.max(pad + 44, Math.min(window.innerHeight - rect.height - pad, clientY - rect.height - 12))}px`;
+    setDynamicStyle(menu, { left: `${Math.max(pad, Math.min(window.innerWidth - rect.width - pad, clientX - rect.width / 2))}px`, top: `${Math.max(pad + 44, Math.min(window.innerHeight - rect.height - pad, clientY - rect.height - 12))}px` });
     menu.querySelectorAll("[data-context-action]").forEach(button => button.onclick = () => {
       const action = button.dataset.contextAction;
       if (action === "favorite") { const previous = state.favorite; state.favorite = !state.favorite; setTimeout(() => toast(state.favorite ? "Added to favorites" : "Removed from favorites", () => { state.favorite = previous; save(); renderAll(); }), 0); }
@@ -339,7 +340,7 @@
     const remaining = list.filter(location => stateFor(location.id).status !== "completed");
     const counts = Object.entries(remaining.reduce((acc, location) => { acc[location.type] = (acc[location.type] || 0) + 1; return acc; }, {})).sort((a,b)=>b[1]-a[1]).slice(0,4);
     host.hidden = false;
-    host.innerHTML = `<div><span>Island Explorer</span><strong>${esc(region)}</strong><small>${stats.completed}/${stats.total} complete • ${stats.percent}%</small></div><div class="island-progress"><span style="width:${stats.percent}%"></span></div><p>${counts.length ? counts.map(([type,count]) => `${count} ${label(type)}`).join(" • ") : "Everything complete"}</p><button id="routeRegionRemaining" class="primary" ${remaining.length ? "" : "disabled"}>Route remaining (${remaining.length})</button>`;
+    host.innerHTML = `<div><span>Island Explorer</span><strong>${esc(region)}</strong><small>${stats.completed}/${stats.total} complete • ${stats.percent}%</small></div><div class="island-progress"><span data-progress="${Math.max(0, Math.min(100, Math.round(stats.percent)))}"></span></div><p>${counts.length ? counts.map(([type,count]) => `${count} ${label(type)}`).join(" • ") : "Everything complete"}</p><button id="routeRegionRemaining" class="primary" ${remaining.length ? "" : "disabled"}>Route remaining (${remaining.length})</button>`;
     $("routeRegionRemaining")?.addEventListener("click", () => { data.route.ids = nearestRoute(remaining).map(location => location.id); save(); drawRoute(); renderMarkers(); toast(`Route built for ${region}`); });
   }
 
@@ -564,7 +565,7 @@
     $("jackdawControls").innerHTML = systems.map(system => `<label class="upgrade-control"><span>${esc(system.name)}</span><select data-system="${system.id}">${Array.from({ length: (system.max || 5) + 1 }, (_, tier) => `<option value="${tier}" ${Number(data.jackdaw[system.id]) === tier ? "selected" : ""}>Tier ${tier}</option>`).join("")}</select></label>`).join("");
     document.querySelectorAll("[data-system]").forEach(select => select.onchange = event => { data.jackdaw[event.target.dataset.system] = Number(event.target.value); save(); renderJackdaw(); });
     const score = readiness();
-    $("overallReadiness").textContent = `${score}%`; $("overallReadinessBar").style.width = `${score}%`;
+    $("overallReadiness").textContent = `${score}%`; setDynamicStyle($("overallReadinessBar"), { width: `${score}%` });
     $("readinessMessage").textContent = score >= 85 ? "Prepared for the hardest naval encounters." : score >= 55 ? "Strong mid-game readiness; elite encounters may remain difficult." : "Prioritize hull, broadside cannons, mortar, and heavy shot.";
     const difficult = locations.filter(location => ["legendary-ship", "fort", "dive-location", "shipwreck"].includes(location.type)).map(location => ({ location, result: locationReadiness(location) })).filter(item => item.result.missing.length).slice(0, 6);
     renderNextUpgrade();
@@ -576,7 +577,7 @@
     source.forEach(location => (groups[location[key]] ||= []).push(location));
     return Object.entries(groups).sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([name, list]) => {
       const stats = completion(list);
-      return `<div class="progress-group"><div><span>${esc(key === "type" ? label(name) : name)}</span><strong>${stats.completed}/${stats.total}</strong></div><div class="progress-track"><span style="width:${stats.percent}%"></span></div></div>`;
+      return `<div class="progress-group"><div><span>${esc(key === "type" ? label(name) : name)}</span><strong>${stats.completed}/${stats.total}</strong></div><div class="progress-track"><span data-progress="${Math.max(0, Math.min(100, Math.round(stats.percent)))}"></span></div></div>`;
     }).join("");
   }
   function renderProgress() {
@@ -586,7 +587,7 @@
     const found = locations.filter(location => stateFor(location.id).status !== "not-started").length;
     const favorites = locations.filter(location => stateFor(location.id).favorite).length;
     $("progressMetrics").innerHTML = `<div class="metric"><span>Completed</span><strong>${overall.completed}/${overall.total}</strong></div><div class="metric"><span>Discovered</span><strong>${found}</strong></div><div class="metric"><span>Favorites</span><strong>${favorites}</strong></div><div class="metric"><span>Overall</span><strong>${overall.percent}%</strong></div>`;
-    $("visibleProgress").innerHTML = `<div class="progress-group"><div><span>${esc(filterDescription())}</span><strong>${visibleStats.completed}/${visibleStats.total} • ${visibleStats.percent}%</strong></div><div class="progress-track"><span style="width:${visibleStats.percent}%"></span></div></div>`;
+    $("visibleProgress").innerHTML = `<div class="progress-group"><div><span>${esc(filterDescription())}</span><strong>${visibleStats.completed}/${visibleStats.total} • ${visibleStats.percent}%</strong></div><div class="progress-track"><span data-progress="${Math.max(0, Math.min(100, Math.round(visibleStats.percent)))}"></span></div></div>`;
     $("categoryProgress").innerHTML = progressGroup("type"); $("regionProgress").innerHTML = progressGroup("region");
     const incomplete = plannerItems();
     renderMilestones();
@@ -767,7 +768,10 @@
       ["dom:captainFleetView", !!$("captainFleetView")],
       ["dom:progressPanel", !!$("progressPanel")],
       ["dom:logPanel", !!$("logPanel")],
-      ["dom:settingsPanel", !!$("settingsPanel")]
+      ["dom:settingsPanel", !!$("settingsPanel")],
+      ["security:noInlineStyleAttributes", document.querySelectorAll("[style]").length === 0],
+      ["security:noCurrentCspViolations", !(window.__ANIMUS_STARTUP_ERRORS || []).some(item => item.type === "csp")],
+      ["runtime:noUncaughtStartupErrors", !(window.__ANIMUS_STARTUP_ERRORS || []).some(item => ["error", "unhandledrejection"].includes(item.type))]
     ];
     const failed = checks.filter(([, pass]) => !pass).map(([name]) => name);
     const result = {
@@ -880,8 +884,7 @@
   function positionMoreActions() {
     const menu=$("moreActionsMenu"),button=$("moreActionsButton"); if(!menu||!button||menu.hidden)return;
     const rect=button.getBoundingClientRect();
-    menu.style.top=`${Math.min(window.innerHeight-menu.offsetHeight-10,rect.bottom+8)}px`;
-    menu.style.right=`${Math.max(8,window.innerWidth-rect.right)}px`;
+    setDynamicStyle(menu, { top: `${Math.min(window.innerHeight-menu.offsetHeight-10,rect.bottom+8)}px`, right: `${Math.max(8,window.innerWidth-rect.right)}px` });
   }
   function closeMoreActions({restoreFocus=false}={}){const menu=$("moreActionsMenu"),button=$("moreActionsButton");if(!menu||!button)return;menu.hidden=true;menu.classList.remove("open");button.setAttribute("aria-expanded","false");if(restoreFocus)button.focus();}
   function openMoreActions(){const menu=$("moreActionsMenu"),button=$("moreActionsButton");if(!menu||!button)return;moreActionsOpenedAt=performance.now();if(menu.parentElement!==document.body)document.body.appendChild(menu);menu.hidden=false;menu.classList.add("open");button.setAttribute("aria-expanded","true");requestAnimationFrame(()=>{positionMoreActions();menu.querySelector('[role="menuitem"]')?.focus({preventScroll:true});});}
@@ -962,7 +965,8 @@
       if (file.size > 12 * 1024 * 1024) throw new Error("Backup file exceeds the 12 MB safety limit");
       if (!/\.json$/i.test(file.name) || (file.type && !["application/json", "text/json", "text/plain"].includes(file.type))) throw new Error("Choose a valid JSON backup file");
       const payload = JSON.parse(await file.text()); validateBackup(payload);
-      const imported = payload.data;
+      const imported = clone(payload.data);
+      delete imported.encyclopediaBookmarks;
       const importedStates=Object.keys(imported.locations||{}).length, importedLog=Array.isArray(imported.log)?imported.log.length:0;
       if(!confirm(`Import backup with ${importedStates} saved location states and ${importedLog} log entries? A recovery snapshot will be created first.`)) return;
       snapshot("Before backup import");
@@ -982,7 +986,7 @@
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
   window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
   $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; runStartupRegressionTests();
-  renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
+  renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(runStartupRegressionTests, 350); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
   window.dispatchEvent(new CustomEvent("animus:app-ready"));
   setTimeout(() => $("bootScreen")?.classList.add("hide"), 350); setTimeout(() => $("bootScreen")?.remove(), 850);
   if ("serviceWorker" in navigator) window.addEventListener("load", async () => {

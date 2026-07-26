@@ -1,7 +1,7 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.3.3",
-  "buildId": "animus-v7.3.3-20260726",
+  "releaseVersion": "7.3.4",
+  "buildId": "animus-v7.3.4-20260726",
   "algorithm": "SHA-256",
   "copyrightOwner": "Stephen Vare",
   "officialRepositoryOwner": "m6vfjyhrwp-ctrl",
@@ -9,22 +9,22 @@
     {
       "path": "index.html",
       "size": 21275,
-      "sha256": "d289ac5d7faf0c794e97e527ab0992041738bf540b80dd8edca4972a879c29e5"
+      "sha256": "63bee60062fb26a84857444fd0251638eeed510a52120f4dedbdcfcb18bf4a0b"
     },
     {
       "path": "styles.css",
-      "size": 35035,
-      "sha256": "b47f84c9b4cbf63fc552ff5a9f375b47a735cb2dc0707738c5e9819f1f94e391"
+      "size": 38292,
+      "sha256": "4aa6f5d953e61ac8ed3943d5b8cd1fb66f38288b1b0155f63aebaa91d87fb73c"
     },
     {
       "path": "startup-guard.js",
-      "size": 1784,
-      "sha256": "ccfa9b60891e6bda7af5403e4df45328c031d3306d22bd1edab400fa1bc155e6"
+      "size": 3057,
+      "sha256": "c6f31655e2383725ff183d79133d5127d13b8894a16f7fd310b0e7df2a274b33"
     },
     {
       "path": "release-identity.js",
       "size": 417,
-      "sha256": "7cf44d6731f7fe40ffb49e72d3c0a4c0936fc14dff176f55285e745140509d3a"
+      "sha256": "10c18b5c4ed6c474c5e2db2277471a7af47cf40905cc45f10b2b2531333e89a0"
     },
     {
       "path": "integrity.js",
@@ -33,8 +33,8 @@
     },
     {
       "path": "engine.js",
-      "size": 8893,
-      "sha256": "37c196dfb583a64956fee77c48bcb4ce80797bcd5dcbc69ba8b3d26d52e1312a"
+      "size": 8971,
+      "sha256": "1df5eea6bb4f171bb8677e851ee0178b935f47e9c65c26c46a2fdfcdf15261f0"
     },
     {
       "path": "database.js",
@@ -43,18 +43,18 @@
     },
     {
       "path": "app.js",
-      "size": 87624,
-      "sha256": "046a567c1a66b3a4fda023273511433b678cf37a296e0f1ba1409cc0dfe10b2b"
+      "size": 88378,
+      "sha256": "c3c4073326b2c7c7f366e4a549f20b359971d3af7310ef855328ab85e41106c0"
     },
     {
       "path": "developer-console.js",
-      "size": 20742,
-      "sha256": "1372545b48d91b846aa53317f2cbc4a926b131978f7e1e406026d970abd4225b"
+      "size": 21173,
+      "sha256": "f28dfbf0797e1f5bdb8de94c1dd8c30c1506660f37387bd172cbc4fa0bb9d5ab"
     },
     {
       "path": "service-worker.js",
       "size": 2030,
-      "sha256": "ec1ac027b5f64bce9315c14d74661703e10140b536cc4636b0a85a7475218a16"
+      "sha256": "356d630d6320cf62882b5b4f1b9b7a85d2bee3ba63b159e0614634e41aa2157b"
     },
     {
       "path": "manifest.webmanifest",
@@ -63,13 +63,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 297,
-      "sha256": "7d879c5131ffc8e151448f6c05d43a3bf716b655b9ee4ed9645a9a96930e16f7"
+      "size": 294,
+      "sha256": "d82b3fcba392c4d120615398113f572b0d6a15910c0471b5feffc3c8b7ac1e3a"
     },
     {
       "path": "release-identity.json",
       "size": 414,
-      "sha256": "043a81035fc7480728f752f6b33fe2b40becedf409bc2d5bbe8a32bfb0c2e1ed"
+      "sha256": "a41ca9c24579d4ad320fa947b576f92289584839bc901bec268f75ee699d0bd3"
     },
     {
       "path": "caribbean-map.jpg",

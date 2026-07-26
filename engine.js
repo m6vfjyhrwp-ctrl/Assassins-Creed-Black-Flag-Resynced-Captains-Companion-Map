@@ -14,6 +14,7 @@
 
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const pointerList = () => [...state.pointers.values()];
+  const setDynamicStyle = (element, declarations) => window.ANIMUS_SET_DYNAMIC_STYLE?.(element, declarations);
 
   function bounds() {
     const vw = viewport.clientWidth;
@@ -39,8 +40,7 @@
 
   function draw(notify = true) {
     constrain();
-    stage.style.transform = `translate3d(${state.x}px,${state.y}px,0) scale(${state.scale})`;
-    document.documentElement.style.setProperty("--marker-scale", String(1 / Math.sqrt(state.scale)));
+    setDynamicStyle(stage, { transform: `translate3d(${state.x}px,${state.y}px,0) scale(${state.scale})`, "--marker-scale": String(1 / Math.sqrt(state.scale)) });
     if (notify) notifyChange();
   }
 
