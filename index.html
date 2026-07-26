@@ -10,14 +10,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="apple-mobile-web-app-title" content="Animus Companion">
-  <script src="./startup-guard.js?v=7.2.2"></script>
-  <title>Animus Companion 7.2.2 — Public Release</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=7.2.2">
+  <script src="./startup-guard.js?v=7.3.3"></script>
+  <title>Animus Companion 7.3.3 — Stability Release</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=7.3.3">
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
-  <link rel="stylesheet" href="./styles.css?v=7.2.2">
+  <link rel="stylesheet" href="./styles.css?v=7.3.3">
 </head>
 <body>
   <div id="bootScreen" class="boot-screen" aria-label="Loading Animus Companion">
@@ -32,7 +32,7 @@
     </button>
     <div class="header-actions">
       <button id="globalSearchButton" class="icon-button" type="button" aria-label="Search">⌕</button>
-      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.3.2 <small id="releaseStatusText">Integrity Not Verified</small></button>
+      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.3.3 <small id="releaseStatusText">Integrity Not Verified</small></button>
     </div>
   </header>
 
@@ -104,10 +104,9 @@
 
     <section id="jackdawPanel" class="app-panel content-panel">
 <section class="hero-card"><span>CAPTAIN’S EDITION</span><h2>Jackdaw & Fleet</h2><p>Track ship systems, plan upgrades, manage captured vessels, and keep naval notes entirely offline.</p></section>
-<nav class="section-tabs" aria-label="Captain tools"><button class="active" data-captain-view="ship">Jackdaw</button><button data-captain-view="fleet">Fleet</button><button data-captain-view="encyclopedia">Encyclopedia</button></nav>
+<nav class="section-tabs" aria-label="Captain tools"><button class="active" data-captain-view="ship">Jackdaw</button><button data-captain-view="fleet">Fleet</button></nav>
 <section id="captainShipView" class="captain-view active"><section class="panel"><div id="jackdawControls" class="upgrade-grid"></div></section><section class="panel readiness"><div><span>Overall readiness</span><strong id="overallReadiness">0%</strong></div><div class="progress-track"><span id="overallReadinessBar"></span></div><p id="readinessMessage"></p><div id="upgradeSuggestions"></div><div id="nextUpgradeCard"></div></section></section>
 <section id="captainFleetView" class="captain-view"><section class="panel fleet-editor"><h2>Add fleet vessel</h2><div class="form-grid"><input id="fleetShipName" placeholder="Ship name"><select id="fleetShipClass"><option>Schooner</option><option>Brig</option><option>Frigate</option><option>Man O’ War</option></select><input id="fleetShipPower" type="number" min="1" max="100" placeholder="Power"><input id="fleetShipCargo" type="number" min="0" placeholder="Cargo"><textarea id="fleetShipNotes" placeholder="Repairs, routes, or notes"></textarea><button id="addFleetShip" class="primary">Add vessel</button></div></section><section class="panel"><div id="fleetSummary" class="metric-grid"></div><div id="fleetList"></div></section></section>
-<section id="captainEncyclopediaView" class="captain-view"><section class="panel"><label class="search-box"><span>⌕</span><input id="encyclopediaSearch" type="search" placeholder="Search ships, islands, tactics, upgrades"></label><div id="encyclopediaList"></div></section></section>
 </section>
 
     <section id="progressPanel" class="app-panel content-panel"><section class="hero-card"><span>SYNCHRONIZATION</span><h2>World Progress</h2><p>Overall and filtered completion by category and region.</p></section><section class="panel"><div id="progressMetrics" class="metric-grid"></div></section><section class="panel"><h2>Visible-filter progress</h2><div id="visibleProgress"></div></section><section class="panel"><h2>Category progress</h2><div id="categoryProgress"></div></section><section class="panel"><h2>Region progress</h2><div id="regionProgress"></div></section><section class="panel"><h2>100% Completion Planner</h2><div class="planner-controls"><select id="plannerScope"><option value="visible">Current filters</option><option value="all">Whole database</option><option value="favorites">Favorites</option><option value="route">Current route</option></select><select id="plannerSort"><option value="nearest">Nearest</option><option value="category">Category</option><option value="region">Region</option><option value="route">Route order</option><option value="verification">Verification</option></select><button id="buildPlannerRoute" class="primary">Route remaining</button></div><div id="milestoneCards" class="milestone-grid"></div><div id="locationProgressList"></div></section></section>
@@ -182,6 +181,6 @@
     <div id="detailContent"></div>
   </aside>
 
-  <script src="./release-identity.js?v=7.2.2"></script><script src="./database.js?v=7.2.2"></script><script src="./engine.js?v=7.2.2"></script><script src="./integrity.js?v=7.2.2"></script><script src="./app.js?v=7.2.2"></script><script src="./developer-console.js?v=7.2.2"></script>
+  <script src="./release-identity.js?v=7.3.3"></script><script src="./database.js?v=7.3.3"></script><script src="./engine.js?v=7.3.3"></script><script src="./integrity.js?v=7.3.3"></script><script src="./app.js?v=7.3.3"></script><script src="./developer-console.js?v=7.3.3"></script>
 </body>
 </html>

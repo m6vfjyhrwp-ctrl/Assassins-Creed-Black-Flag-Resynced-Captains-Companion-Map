@@ -1,11 +1,11 @@
 {
-  "version": "7.3.2",
-  "name": "Regression Repair",
+  "version": "7.3.3",
+  "name": "Encyclopedia Removal & Regression Guard",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
   "released": "2026-07-26",
-  "buildId": "animus-v7.3.2-20260726",
+  "buildId": "animus-v7.3.3-20260726",
   "releaseChannel": "production",
   "integrityManifestVersion": 2
 }

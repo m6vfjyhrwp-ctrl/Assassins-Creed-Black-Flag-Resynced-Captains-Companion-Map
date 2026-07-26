@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.3.2";
+  const APP_VERSION = RELEASE.version || "7.3.3";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -16,7 +16,7 @@
     version: window.ACBF_USER_DATA_VERSION || 3,
     settings: { mode: "normal", reduceMotion: false, onboardingComplete: false, includeCompletedSuggestions: false, recentSearches: [], markerSize: "normal", routeSkipCompleted: true, animusMode: false },
     filters: { categories: [], hideCompleted: false, favoritesOnly: false, incompleteOnly: false, discoveredOnly: false, verifiedOnly: false, legacyOnly: false, region: "all" },
-    locations: {}, jackdaw: Object.fromEntries(systems.map(s => [s.id, 0])), fleet: [], encyclopediaBookmarks: [], log: [],
+    locations: {}, jackdaw: Object.fromEntries(systems.map(s => [s.id, 0])), fleet: [], log: [],
     route: { ids: [], source: "visible-incomplete", strategy: "nearest", manualIds: [] },
     ui: { activeTab: "map", selectedId: null, sheetSize: "half", searchAcrossAll: false, query: "", nextObjectiveId: null },
     mapView: { x: 0, y: 0, scale: 1 },
@@ -44,7 +44,6 @@
         jackdaw: { ...defaults.jackdaw, ...(saved.jackdaw || {}) },
         log: Array.isArray(saved.log) ? saved.log : [],
         fleet: Array.isArray(saved.fleet) ? saved.fleet : [],
-        encyclopediaBookmarks: Array.isArray(saved.encyclopediaBookmarks) ? saved.encyclopediaBookmarks : [],
         route: { ...defaults.route, ...(saved.route || {}), ids: Array.isArray(saved.route?.ids) ? saved.route.ids.filter(byId) : [], manualIds: Array.isArray(saved.route?.manualIds) ? saved.route.manualIds.filter(byId) : [] },
         ui: { ...defaults.ui, ...(saved.ui || {}) },
         mapView: { ...defaults.mapView, ...(saved.mapView || {}) },
@@ -751,15 +750,45 @@
     });
   }
 
-  function validateRequiredFunctions() {
-    const required = { renderAll, openLocation, addCorrectionButton, renderFleet, renderJackdaw, renderProgress, renderLog };
-    const missing = Object.entries(required).filter(([, fn]) => typeof fn !== "function").map(([name]) => name);
-    window.ANIMUS_REGRESSION_STATUS = { checkedAt: new Date().toISOString(), pass: missing.length === 0, missing };
-    if (missing.length) console.error("Required application functions missing", missing);
-    return missing.length === 0;
+  function runStartupRegressionTests() {
+    const checks = [
+      ["function:renderAll", typeof renderAll === "function"],
+      ["function:openLocation", typeof openLocation === "function"],
+      ["function:addCorrectionButton", typeof addCorrectionButton === "function"],
+      ["function:renderFleet", typeof renderFleet === "function"],
+      ["function:renderJackdaw", typeof renderJackdaw === "function"],
+      ["function:renderProgress", typeof renderProgress === "function"],
+      ["function:renderLog", typeof renderLog === "function"],
+      ["data:ACBF_LOCATIONS", Array.isArray(window.ACBF_LOCATIONS) && window.ACBF_LOCATIONS.length > 0],
+      ["data:ACBF_JACKDAW_SYSTEMS", Array.isArray(window.ACBF_JACKDAW_SYSTEMS) && window.ACBF_JACKDAW_SYSTEMS.length > 0],
+      ["dom:mapPanel", !!$("mapPanel")],
+      ["dom:detailSheet", !!$("detailSheet")],
+      ["dom:captainShipView", !!$("captainShipView")],
+      ["dom:captainFleetView", !!$("captainFleetView")],
+      ["dom:progressPanel", !!$("progressPanel")],
+      ["dom:logPanel", !!$("logPanel")],
+      ["dom:settingsPanel", !!$("settingsPanel")]
+    ];
+    const failed = checks.filter(([, pass]) => !pass).map(([name]) => name);
+    const result = {
+      checkedAt: new Date().toISOString(),
+      release: APP_VERSION,
+      pass: failed.length === 0,
+      total: checks.length,
+      passed: checks.length - failed.length,
+      failed,
+      checks: Object.fromEntries(checks)
+    };
+    window.ANIMUS_REGRESSION_STATUS = result;
+    if (!result.pass) {
+      console.error("Animus startup regression test failed", result);
+      window.__ANIMUS_STARTUP_ERRORS?.push?.({ time: result.checkedAt, type: "regression", detail: `Failed checks: ${failed.join(", ")}` });
+    } else {
+      console.info(`Animus startup regression test passed (${result.passed}/${result.total})`);
+    }
+    window.dispatchEvent(new CustomEvent("animus:regression-complete", { detail: result }));
+    return result.pass;
   }
-
-  function renderEncyclopedia(){const q=String($("encyclopediaSearch")?.value||"").toLowerCase();const rows=encyclopediaEntries.filter(e=>!q||`${e.title} ${e.category} ${e.body}`.toLowerCase().includes(q));$("encyclopediaList").innerHTML=rows.map(e=>`<article class="encyclopedia-card"><header><div><small>${esc(e.category)}</small><strong>${esc(e.title)}</strong></div><button data-bookmark="${e.id}" aria-label="Bookmark ${esc(e.title)}">${data.encyclopediaBookmarks.includes(e.id)?"★":"☆"}</button></header><p>${esc(e.body)}</p></article>`).join('')||'<p class="empty-state">No matching encyclopedia entries.</p>';document.querySelectorAll('[data-bookmark]').forEach(b=>b.onclick=()=>{const id=b.dataset.bookmark;data.encyclopediaBookmarks=data.encyclopediaBookmarks.includes(id)?data.encyclopediaBookmarks.filter(x=>x!==id):[...data.encyclopediaBookmarks,id];save();renderEncyclopedia()})}
   function renderNextUpgrade(){const missing=systems.map(s=>({s,t:Number(data.jackdaw[s.id]||0)})).filter(x=>x.t<(x.s.max||5)).sort((a,b)=>a.t-b.t)[0];$("nextUpgradeCard").innerHTML=missing?`<article class="next-upgrade-card"><small>RECOMMENDED NEXT UPGRADE</small><h3>${esc(missing.s.name)} — Tier ${missing.t+1}</h3><p>Suggested because it is among your lowest current ship systems. Exact costs and benefits are not claimed unless stored in verified location data.</p></article>`:'<p class="empty-state">Every tracked Jackdaw system is at maximum tier.</p>'}
   function plannerItems(){let rows;if($("plannerScope")?.value==="all")rows=[...locations];else if($("plannerScope")?.value==="favorites")rows=locations.filter(l=>stateFor(l.id).favorite);else if($("plannerScope")?.value==="route")rows=data.route.ids.map(byId).filter(Boolean);else rows=getVisibleLocations();rows=rows.filter(l=>stateFor(l.id).status!=="completed");const sort=$("plannerSort")?.value||"nearest";if(sort==="category")rows.sort((a,b)=>a.type.localeCompare(b.type)||a.name.localeCompare(b.name));if(sort==="region")rows.sort((a,b)=>a.region.localeCompare(b.region)||a.name.localeCompare(b.name));if(sort==="verification")rows.sort((a,b)=>a.verification.localeCompare(b.verification));if(sort==="route"){const m=new Map(data.route.ids.map((id,i)=>[id,i]));rows.sort((a,b)=>(m.get(a.id)??9999)-(m.get(b.id)??9999))}if(sort==="nearest")rows=nearestRoute(rows);return rows}
   function renderMilestones(){const c=completion(locations),fav=locations.filter(l=>stateFor(l.id).favorite).length,regions=unique(locations.map(l=>l.region)).filter(r=>locations.filter(l=>l.region===r).every(l=>stateFor(l.id).status==="completed")).length;const ms=[['First Synchronization',c.completed>=1],['Quartermaster',c.percent>=25],['Master Explorer',c.percent>=50],['Caribbean Legend',c.percent>=100],['Collector',fav>=10],['Island Sweeper',regions>=1]];$("milestoneCards").innerHTML=ms.map(([n,u])=>`<div class="milestone ${u?'unlocked':''}"><strong>${u?'◆':'◇'} ${n}</strong><small>${u?'Unlocked locally':'Not yet unlocked'}</small></div>`).join('')}
@@ -779,7 +808,7 @@
     ["hideCompleted", "favoritesOnly", "incompleteOnly", "discoveredOnly", "verifiedOnly", "legacyOnly"].forEach(key => $(key).checked = !!data.filters[key]);
   }
   function renderAll() {
-    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderEncyclopedia(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
+    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
   }
 
   function switchTab(name) {
@@ -899,7 +928,6 @@
   window.addEventListener("scroll",positionMoreActions,true);
   document.querySelectorAll("[data-captain-view]").forEach(button=>button.onclick=()=>{document.querySelectorAll("[data-captain-view]").forEach(b=>b.classList.toggle("active",b===button));document.querySelectorAll(".captain-view").forEach(v=>v.classList.remove("active"));$(`captain${label(button.dataset.captainView).replaceAll(" ","")}View`).classList.add("active")});
   $("addFleetShip").onclick=()=>{const name=$("fleetShipName").value.trim();if(!name)return toast("Enter a ship name");data.fleet.push({id:crypto.randomUUID?.()||Date.now(),name,className:$("fleetShipClass").value,power:Number($("fleetShipPower").value||0),cargo:Number($("fleetShipCargo").value||0),notes:$("fleetShipNotes").value.trim(),status:"ready",profit:0});["fleetShipName","fleetShipPower","fleetShipCargo","fleetShipNotes"].forEach(id=>$(id).value="");save();renderFleet();toast("Fleet vessel added")};
-  $("encyclopediaSearch").oninput=renderEncyclopedia;
   $("plannerScope").onchange=renderProgress; $("plannerSort").onchange=renderProgress; $("buildPlannerRoute").onclick=()=>{const rows=plannerItems();if(!rows.length)return toast("No remaining objectives in this planner scope");data.route.ids=nearestRoute(rows).map(l=>l.id);save();switchTab("map");drawRoute();renderMarkers();toast(`Completion route built with ${rows.length} stops`)};
   $("animusMode").onchange=e=>{data.settings.animusMode=e.target.checked;save();renderSettings();toast(`Animus Mode ${e.target.checked?'enabled':'disabled'}`)}; $("markerSize").onchange=e=>{data.settings.markerSize=e.target.value;save();renderAll()}; $("routeSkipCompleted").onchange=e=>{data.settings.routeSkipCompleted=e.target.checked;save();drawRoute();toast("Route behavior saved")};
   $("contextScreenshotInput").onchange = async event => {
@@ -953,7 +981,7 @@
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
   window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
-  $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; validateRequiredFunctions();
+  $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; runStartupRegressionTests();
   renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
   window.dispatchEvent(new CustomEvent("animus:app-ready"));
   setTimeout(() => $("bootScreen")?.classList.add("hide"), 350); setTimeout(() => $("bootScreen")?.remove(), 850);
