@@ -1,8 +1,8 @@
 {
   "project": "Animus Companion",
-  "version": "7.3.4",
-  "buildId": "animus-v7.3.4-20260726",
-  "releaseDate": "2026-07-24",
+  "version": "7.3.5",
+  "buildId": "animus-v7.3.5-20260726",
+  "releaseDate": "2026-07-26",
   "copyrightOwner": "Stephen Vare",
   "repositoryOwner": "m6vfjyhrwp-ctrl",
   "officialRepository": "https://github.com/m6vfjyhrwp-ctrl/Assassins-Creed-Black-Flag-Companion-Map",
@@ -12,5 +12,5 @@
   "userDataSchemaVersion": 3,
   "license": "Source-available; all rights reserved for original project material; third-party rights excluded",
   "signatureStatus": "Unsigned package; sign the Git tag/release externally using SIGNING.md. No private key is included.",
-  "releaseTitle": "Developer Console & Maintenance Hardening"
+  "releaseTitle": "Map Framing & Coordinate Integrity"
 }

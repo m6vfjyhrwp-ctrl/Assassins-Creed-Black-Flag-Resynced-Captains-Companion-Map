@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.3.4";
+  const APP_VERSION = RELEASE.version || "7.3.5";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -247,7 +247,7 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "marker cluster";
-        setDynamicStyle(button, { left: `${item.x}%`, top: `${item.y}%` });
+        setDynamicStyle(button, { left: `${Math.max(1.5, Math.min(98.5, item.x))}%`, top: `${Math.max(1.5, Math.min(98.5, item.y))}%` });
         button.textContent = item.group.length;
         button.setAttribute("aria-label", `${item.group.length} nearby locations`);
         button.onclick = event => {
@@ -263,7 +263,7 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = markerClass(location) + (routeIndex.has(location.id) ? " route-stop" : "");
-      setDynamicStyle(button, { left: `${item.x ?? location.mapPosition.x}%`, top: `${item.y ?? location.mapPosition.y}%` });
+      setDynamicStyle(button, { left: `${Math.max(1.5, Math.min(98.5, item.x ?? location.mapPosition.x))}%`, top: `${Math.max(1.5, Math.min(98.5, item.y ?? location.mapPosition.y))}%` });
       if (item.displaced) button.classList.add("spread-marker");
       button.dataset.id = location.id;
       if (routeIndex.has(location.id)) button.dataset.routeOrder = routeIndex.get(location.id);
@@ -322,10 +322,9 @@
   function nearestToMapCenter() {
     const candidates = getVisibleLocations().filter(location => stateFor(location.id).status !== "completed");
     if (!candidates.length) return toast("No incomplete visible locations");
-    const map = window.ACBF_MAP?.getState?.() || { x: 0, y: 0, scale: 1 };
-    const viewport = $("viewport");
-    const centerX = ((viewport.clientWidth / 2 - map.x) / map.scale) / viewport.clientWidth * 100;
-    const centerY = ((viewport.clientHeight / 2 - map.y) / map.scale) / viewport.clientHeight * 100;
+    const center = window.ACBF_MAP?.getCenterPercent?.() || { x: 50, y: 50 };
+    const centerX = center.x;
+    const centerY = center.y;
     const nearest = [...candidates].sort((a, b) => Math.hypot(a.mapPosition.x - centerX, a.mapPosition.y - centerY) - Math.hypot(b.mapPosition.x - centerX, b.mapPosition.y - centerY))[0];
     if (!data.route.ids.includes(nearest.id)) data.route.ids = [nearest.id, ...data.route.ids.filter(id => id !== nearest.id)];
     save(); openLocation(nearest.id, true); drawRoute(); toast(`Nearest visible objective: ${nearest.name}`);
@@ -605,9 +604,7 @@
   }
 
   function mapCenterPercent() {
-    const map = window.ACBF_MAP?.getState?.() || { x: 0, y: 0, scale: 1 };
-    const viewport = $("viewport");
-    return { x: ((viewport.clientWidth / 2 - map.x) / map.scale) / viewport.clientWidth * 100, y: ((viewport.clientHeight / 2 - map.y) / map.scale) / viewport.clientHeight * 100 };
+    return window.ACBF_MAP?.getCenterPercent?.() || { x: 50, y: 50 };
   }
   function chooseNextObjective(skipCurrent = false) {
     const incomplete = locations.filter(location => data.settings.includeCompletedSuggestions || stateFor(location.id).status !== "completed");
@@ -769,6 +766,10 @@
       ["dom:progressPanel", !!$("progressPanel")],
       ["dom:logPanel", !!$("logPanel")],
       ["dom:settingsPanel", !!$("settingsPanel")],
+      ["map:geometryAvailable", !!window.ACBF_MAP?.getGeometry?.()],
+      ["map:sourceAspectRatioPreserved", Math.abs((window.ACBF_MAP?.getGeometry?.().aspect || 0) - (1944 / 1665)) < 0.0001],
+      ["map:allDatabaseMarkersInBounds", locations.every(location => Number.isFinite(location.mapPosition?.x) && Number.isFinite(location.mapPosition?.y) && location.mapPosition.x >= 0 && location.mapPosition.x <= 100 && location.mapPosition.y >= 0 && location.mapPosition.y <= 100)],
+      ["map:transformFinite", Object.values(window.ACBF_MAP?.getState?.() || {}).every(Number.isFinite)],
       ["security:noInlineStyleAttributes", document.querySelectorAll("[style]").length === 0],
       ["security:noCurrentCspViolations", !(window.__ANIMUS_STARTUP_ERRORS || []).some(item => item.type === "csp")],
       ["runtime:noUncaughtStartupErrors", !(window.__ANIMUS_STARTUP_ERRORS || []).some(item => ["error", "unhandledrejection"].includes(item.type))]

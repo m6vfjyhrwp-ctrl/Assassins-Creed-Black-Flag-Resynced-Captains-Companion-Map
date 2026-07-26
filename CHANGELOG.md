@@ -1,3 +1,16 @@
+# Changelog
+
+## 7.3.5 — Map Framing & Coordinate Integrity
+
+- Preserves the source Caribbean map’s native 1944×1665 aspect ratio instead of stretching it to the viewport.
+- Fits and centers the complete map at reset with clean letterboxing where necessary.
+- Constrains panning to the rendered map surface at every zoom level.
+- Keeps marker, cluster, and route geometry on one shared aspect-correct coordinate surface.
+- Clamps rendered marker centers inside the visible map boundary while retaining stored coordinates.
+- Corrects map-center calculations used by Nearest Objective and planning features.
+- Adds regression checks for map geometry, aspect ratio, finite transforms, and database marker bounds.
+- Restores repository governance and release-verification files in `.github`.
+
 ## 7.3.4 — Private Beta Candidate Packaging
 - Restored `.github/CODEOWNERS` and `.github/workflows/verify-release.yml`.
 - Added private-beta installation, testing, backup, and reporting guidance.
