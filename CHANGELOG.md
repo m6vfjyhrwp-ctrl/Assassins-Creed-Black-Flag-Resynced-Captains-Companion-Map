@@ -1,3 +1,9 @@
+## 7.3.4 — Private Beta Candidate Packaging
+- Restored `.github/CODEOWNERS` and `.github/workflows/verify-release.yml`.
+- Added private-beta installation, testing, backup, and reporting guidance.
+- Added an explicit known-issues and pending-certification record.
+- Regenerated repository checksums and verified the complete root-level package.
+
 ## 7.3.4 — CSP Hardening and Regression Expansion
 - Removed runtime inline style attributes in favor of CSP-safe stylesheet rules.
 - Added post-render CSP and uncaught-error regression checks.
