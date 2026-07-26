@@ -1,11 +1,11 @@
 {
-  "version": "7.2.2",
-  "name": "Startup Reliability Hotfix",
+  "version": "7.3.0",
+  "name": "Developer Console Health Dashboard",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
   "released": "2026-07-25",
-  "buildId": "animus-v7.2.2-20260725",
+  "buildId": "animus-v7.3.0-20260725",
   "releaseChannel": "production",
   "integrityManifestVersion": 2
 }

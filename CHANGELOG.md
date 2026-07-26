@@ -1,3 +1,12 @@
+## 7.3.0 — Developer Console Health Dashboard
+
+- Added live module health and startup timeline panels.
+- Added navigation, paint, and resource performance readings.
+- Added detailed error, promise rejection, CSP, and network logging.
+- Added richer diagnostics v2 export with stacks, modules, performance, service worker, caches, storage, and validation.
+- Added safe cache inventory and confirmed obsolete Animus cache cleanup while preserving the current cache.
+- Preserved database version 9, schema 3, onboarding, and saved-data compatibility.
+
 # Changelog
 
 ## 7.2.2 — Startup escape hardening

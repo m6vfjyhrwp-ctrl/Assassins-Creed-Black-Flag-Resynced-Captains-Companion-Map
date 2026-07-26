@@ -1,20 +1,20 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.2.2",
-  "buildId": "animus-v7.2.2-20260725",
+  "releaseVersion": "7.3.0",
+  "buildId": "animus-v7.3.0-20260725",
   "algorithm": "SHA-256",
   "copyrightOwner": "Stephen Vare",
   "officialRepositoryOwner": "m6vfjyhrwp-ctrl",
   "files": [
     {
       "path": "index.html",
-      "size": 20881,
-      "sha256": "11543697bb02a4fe99eab3755655b085d9595a7527aad1ea84cafb16bb5e67af"
+      "size": 21620,
+      "sha256": "f15e81fd0e52b28bf98fe808759716a5368c4896c5a795af2a0d4a8120ebc9f7"
     },
     {
       "path": "styles.css",
-      "size": 34863,
-      "sha256": "b2782045fa6fc823deccd094103ccccc9b3cc243d8df9869c9c4deda75a5186f"
+      "size": 35080,
+      "sha256": "b59b42dda9cc04411329c35a1c834d9d7fa82d2a87f3d786e493b905506035a9"
     },
     {
       "path": "startup-guard.js",
@@ -24,7 +24,7 @@
     {
       "path": "release-identity.js",
       "size": 458,
-      "sha256": "fc0157bf1c1ad45de6a369c4563b3f50546c3c26cd69d00d18f675d1017f9019"
+      "sha256": "88d24a46571bdda79bca7e509db3f9d63be7979839c874cb4d706c6c064a3f96"
     },
     {
       "path": "integrity.js",
@@ -48,13 +48,13 @@
     },
     {
       "path": "developer-console.js",
-      "size": 13832,
-      "sha256": "e5b07db8fe7d6fe2085c9e32a6d87d4d574f0f0a2087298119d02567210094db"
+      "size": 20742,
+      "sha256": "1372545b48d91b846aa53317f2cbc4a926b131978f7e1e406026d970abd4225b"
     },
     {
       "path": "service-worker.js",
       "size": 2030,
-      "sha256": "547f718ba3e0805120c6faad48f8b9e328cc7d97055d5a65e408e67849ea753a"
+      "sha256": "309b9ac05001ec1feb082bb0f55c7f51c1348187db425004a10520f7341a47c3"
     },
     {
       "path": "manifest.webmanifest",
@@ -63,13 +63,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 284,
-      "sha256": "f830e5545cfbcc918ea60834c17a25fffae5f326844a7a73d3f29f78bec0bc78"
+      "size": 292,
+      "sha256": "2a873b3e8df9533b629969910db3fc8150177ec0370fbd882b40b83d97160a29"
     },
     {
       "path": "release-identity.json",
       "size": 414,
-      "sha256": "19d83af2e7fc892e76237b51de2a8a7d50bb5dca9fcaad4c4988a71730e5e8a7"
+      "sha256": "975fb02625c59796296adbe170ffdb0ca6f5fda17e54eea0d3debc7ceb49e50f"
     },
     {
       "path": "caribbean-map.jpg",

@@ -32,7 +32,7 @@
     </button>
     <div class="header-actions">
       <button id="globalSearchButton" class="icon-button" type="button" aria-label="Search">⌕</button>
-      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.2.2 <small id="releaseStatusText">Integrity Not Verified</small></button>
+      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.3.0 <small id="releaseStatusText">Integrity Not Verified</small></button>
     </div>
   </header>
 
@@ -119,15 +119,17 @@
   <p class="mode-explanation">Hidden maintenance tools for this device. This panel contains no GitHub credentials, private keys, or remote administration access.</p>
   <div id="devSessionStatus" class="status-card" aria-live="polite"></div>
   <nav class="developer-tabs" aria-label="Developer console sections">
-    <button type="button" data-dev-tab="status" class="active">System</button><button type="button" data-dev-tab="database">Database</button><button type="button" data-dev-tab="storage">Storage</button><button type="button" data-dev-tab="logs">Logs</button><button type="button" data-dev-tab="maintenance">Maintenance</button>
+    <button type="button" data-dev-tab="status" class="active">System</button><button type="button" data-dev-tab="health">Health</button><button type="button" data-dev-tab="performance">Performance</button><button type="button" data-dev-tab="database">Database</button><button type="button" data-dev-tab="storage">Storage</button><button type="button" data-dev-tab="logs">Logs</button><button type="button" data-dev-tab="maintenance">Maintenance</button>
   </nav>
-  <section data-dev-page="status"><div id="devSystemStats" class="diagnostics-grid"></div></section>
+  <section data-dev-page="status"><div id="devSystemStats" class="diagnostics-grid"></div><div id="devCacheSummary" class="developer-results"></div></section>
+  <section data-dev-page="health" hidden><div id="devModuleHealth" class="developer-results"></div><h3>Startup timeline</h3><div id="devStartupTimeline" class="developer-results"></div></section>
+  <section data-dev-page="performance" hidden><div id="devPerformanceStats" class="diagnostics-grid"></div><div id="devPerformanceDetails" class="developer-results"></div><button id="devRefreshPerformance" type="button">Refresh performance readings</button></section>
   <section data-dev-page="database" hidden><div id="devDatabaseSummary" class="diagnostics-grid"></div><div id="devValidationResults" class="developer-results"></div><button id="devValidateDatabase" type="button">Run database validation</button></section>
   <section data-dev-page="storage" hidden><div id="devStorageSummary" class="diagnostics-grid"></div><div id="devStorageKeys" class="developer-results"></div></section>
   <section data-dev-page="logs" hidden><div class="button-grid"><button id="devExportDiagnostics" type="button">Export diagnostics</button><button id="devClearLogs" type="button">Clear diagnostic logs</button></div><div id="devRuntimeLogs" class="developer-results"></div></section>
   <section data-dev-page="maintenance" hidden>
     <label class="switch"><input id="devMaintenanceEnabled" type="checkbox"><span>Enable maintenance actions</span></label>
-    <div id="devMaintenanceTools" class="button-grid" aria-disabled="true"><button id="devExportBackup" type="button" disabled>Export safety backup</button><button id="devRefreshIntegrity" type="button" disabled>Recheck integrity</button><button id="devUpdateServiceWorker" type="button" disabled>Check service-worker update</button><button id="devClearObsoleteCaches" type="button" disabled>Clear obsolete caches</button></div>
+    <div id="devMaintenanceTools" class="button-grid" aria-disabled="true"><button id="devExportBackup" type="button" disabled>Export safety backup</button><button id="devRefreshIntegrity" type="button" disabled>Recheck integrity</button><button id="devUpdateServiceWorker" type="button" disabled>Check service-worker update</button><button id="devClearObsoleteCaches" type="button" disabled>Clear obsolete caches</button><button id="devCopyHealthSnapshot" type="button" disabled>Export health snapshot</button></div>
     <div class="developer-danger-zone"><h3>Danger Zone</h3><p>These actions affect only this browser installation. Export a backup first.</p><button id="devClearAppData" class="danger" type="button" disabled>Clear all local app data</button></div>
   </section>
 </section></section>
