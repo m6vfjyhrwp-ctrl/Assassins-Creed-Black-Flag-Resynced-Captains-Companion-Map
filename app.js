@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.2.2";
+  const APP_VERSION = RELEASE.version || "7.3.2";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -461,6 +461,32 @@
     selectedId = null; data.ui.selectedId = null; save(); renderMarkers();
     setTimeout(() => $("sheetBackdrop").hidden = true, 240);
   }
+
+  function addCorrectionButton() {
+    const actions = $("detailContent")?.querySelector(".detail-actions");
+    if (!actions || actions.querySelector("#reportCorrectionButton") || !selectedId) return;
+    const button = document.createElement("button");
+    button.id = "reportCorrectionButton";
+    button.type = "button";
+    button.textContent = "Report correction";
+    button.addEventListener("click", () => {
+      const location = byId(selectedId);
+      if (!location) return;
+      const correction = prompt(`Describe the correction for ${location.name}.\n\nThis stays on your device until exported in a backup.`);
+      if (!correction?.trim()) return;
+      data.pendingCorrections.push({
+        id: crypto.randomUUID?.() || `correction-${Date.now()}`,
+        locationId: location.id,
+        locationName: location.name,
+        submittedAt: new Date().toISOString(),
+        note: correction.trim(),
+        status: "pending"
+      });
+      save();
+      toast("Correction saved locally");
+    });
+    actions.appendChild(button);
+  }
   function cycleSheet() {
     const order = ["compact", "half", "full"];
     const current = $("detailSheet").dataset.size || "half";
@@ -687,6 +713,52 @@
     render();
     requestAnimationFrame(()=>$("onboardingNext").focus({preventScroll:true}));
   }
+  function renderFleet() {
+    const fleet = Array.isArray(data.fleet) ? data.fleet : [];
+    const totalPower = fleet.reduce((sum, ship) => sum + Number(ship.power || 0), 0);
+    const totalCargo = fleet.reduce((sum, ship) => sum + Number(ship.cargo || 0), 0);
+    const readyCount = fleet.filter(ship => ship.status !== "repair").length;
+    const summary = $("fleetSummary");
+    const list = $("fleetList");
+    if (!summary || !list) return;
+    summary.innerHTML = [
+      [fleet.length, "Vessels"],
+      [readyCount, "Ready"],
+      [totalPower, "Combined power"],
+      [totalCargo, "Cargo capacity"]
+    ].map(([value, labelText]) => `<div><strong>${esc(value)}</strong><span>${esc(labelText)}</span></div>`).join("");
+    list.innerHTML = fleet.length ? fleet.map(ship => `
+      <article class="fleet-card" data-fleet-id="${esc(ship.id)}">
+        <header><div><small>${esc(ship.className || "Vessel")}</small><strong>${esc(ship.name || "Unnamed vessel")}</strong></div><span>${ship.status === "repair" ? "Repairing" : "Ready"}</span></header>
+        <p>Power ${esc(Number(ship.power || 0))} • Cargo ${esc(Number(ship.cargo || 0))}</p>
+        ${ship.notes ? `<p>${esc(ship.notes)}</p>` : ""}
+        <div class="detail-actions">
+          <button type="button" data-fleet-status="${esc(ship.id)}">${ship.status === "repair" ? "Mark ready" : "Mark repairing"}</button>
+          <button type="button" class="danger" data-fleet-remove="${esc(ship.id)}">Remove vessel</button>
+        </div>
+      </article>`).join("") : `<p class="empty-state">No fleet vessels saved yet.</p>`;
+    document.querySelectorAll("[data-fleet-status]").forEach(button => button.onclick = () => {
+      const ship = fleet.find(item => String(item.id) === button.dataset.fleetStatus);
+      if (!ship) return;
+      ship.status = ship.status === "repair" ? "ready" : "repair";
+      save(); renderFleet();
+    });
+    document.querySelectorAll("[data-fleet-remove]").forEach(button => button.onclick = () => {
+      const ship = fleet.find(item => String(item.id) === button.dataset.fleetRemove);
+      if (!ship || !confirm(`Remove ${ship.name || "this vessel"} from your fleet?`)) return;
+      data.fleet = fleet.filter(item => String(item.id) !== button.dataset.fleetRemove);
+      save(); renderFleet(); toast("Fleet vessel removed");
+    });
+  }
+
+  function validateRequiredFunctions() {
+    const required = { renderAll, openLocation, addCorrectionButton, renderFleet, renderJackdaw, renderProgress, renderLog };
+    const missing = Object.entries(required).filter(([, fn]) => typeof fn !== "function").map(([name]) => name);
+    window.ANIMUS_REGRESSION_STATUS = { checkedAt: new Date().toISOString(), pass: missing.length === 0, missing };
+    if (missing.length) console.error("Required application functions missing", missing);
+    return missing.length === 0;
+  }
+
   function renderEncyclopedia(){const q=String($("encyclopediaSearch")?.value||"").toLowerCase();const rows=encyclopediaEntries.filter(e=>!q||`${e.title} ${e.category} ${e.body}`.toLowerCase().includes(q));$("encyclopediaList").innerHTML=rows.map(e=>`<article class="encyclopedia-card"><header><div><small>${esc(e.category)}</small><strong>${esc(e.title)}</strong></div><button data-bookmark="${e.id}" aria-label="Bookmark ${esc(e.title)}">${data.encyclopediaBookmarks.includes(e.id)?"★":"☆"}</button></header><p>${esc(e.body)}</p></article>`).join('')||'<p class="empty-state">No matching encyclopedia entries.</p>';document.querySelectorAll('[data-bookmark]').forEach(b=>b.onclick=()=>{const id=b.dataset.bookmark;data.encyclopediaBookmarks=data.encyclopediaBookmarks.includes(id)?data.encyclopediaBookmarks.filter(x=>x!==id):[...data.encyclopediaBookmarks,id];save();renderEncyclopedia()})}
   function renderNextUpgrade(){const missing=systems.map(s=>({s,t:Number(data.jackdaw[s.id]||0)})).filter(x=>x.t<(x.s.max||5)).sort((a,b)=>a.t-b.t)[0];$("nextUpgradeCard").innerHTML=missing?`<article class="next-upgrade-card"><small>RECOMMENDED NEXT UPGRADE</small><h3>${esc(missing.s.name)} — Tier ${missing.t+1}</h3><p>Suggested because it is among your lowest current ship systems. Exact costs and benefits are not claimed unless stored in verified location data.</p></article>`:'<p class="empty-state">Every tracked Jackdaw system is at maximum tier.</p>'}
   function plannerItems(){let rows;if($("plannerScope")?.value==="all")rows=[...locations];else if($("plannerScope")?.value==="favorites")rows=locations.filter(l=>stateFor(l.id).favorite);else if($("plannerScope")?.value==="route")rows=data.route.ids.map(byId).filter(Boolean);else rows=getVisibleLocations();rows=rows.filter(l=>stateFor(l.id).status!=="completed");const sort=$("plannerSort")?.value||"nearest";if(sort==="category")rows.sort((a,b)=>a.type.localeCompare(b.type)||a.name.localeCompare(b.name));if(sort==="region")rows.sort((a,b)=>a.region.localeCompare(b.region)||a.name.localeCompare(b.name));if(sort==="verification")rows.sort((a,b)=>a.verification.localeCompare(b.verification));if(sort==="route"){const m=new Map(data.route.ids.map((id,i)=>[id,i]));rows.sort((a,b)=>(m.get(a.id)??9999)-(m.get(b.id)??9999))}if(sort==="nearest")rows=nearestRoute(rows);return rows}
@@ -880,20 +952,9 @@
   const legacyExportDiagnostics=$("exportDiagnostics"); if(legacyExportDiagnostics) legacyExportDiagnostics.onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
-  let lastVisibleErrorKey = "", lastVisibleErrorAt = 0;
-  window.addEventListener("error", event => {
-    const message = String(event.message || event.error?.message || "Unknown error");
-    const opaqueSafariError = message === "Script error." && !event.filename && !event.lineno && !event.colno && !event.error;
-    const benignObserverError = /ResizeObserver loop (?:limit exceeded|completed with undelivered notifications)/i.test(message);
-    console.error(event.error || message);
-    if (opaqueSafariError || benignObserverError) return;
-    const key = `${message}|${event.filename || ""}|${event.lineno || 0}|${event.colno || 0}`;
-    const now = Date.now();
-    if (key === lastVisibleErrorKey && now - lastVisibleErrorAt < 5000) return;
-    lastVisibleErrorKey = key; lastVisibleErrorAt = now;
-    toast("An app action could not be completed. Details were saved in Developer Console logs.");
-  });
-  $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
+  window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
+  $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; validateRequiredFunctions();
+  renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
   window.dispatchEvent(new CustomEvent("animus:app-ready"));
   setTimeout(() => $("bootScreen")?.classList.add("hide"), 350); setTimeout(() => $("bootScreen")?.remove(), 850);
   if ("serviceWorker" in navigator) window.addEventListener("load", async () => {

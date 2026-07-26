@@ -8,7 +8,6 @@
   const MAX_LOGS = 150;
   const $ = id => document.getElementById(id);
   let taps = 0, tapTimer = 0, unlocked = false, expiresAt = 0, inactivityTimer = 0;
-  let lastInteraction = null;
 
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
   const bytes = value => new Blob([value]).size;
@@ -103,18 +102,7 @@
     $("devMaintenanceEnabled")?.addEventListener("change",e=>enableMaintenance(e.target.checked)); $("devExportBackup")?.addEventListener("click",exportBackup); $("devRefreshIntegrity")?.addEventListener("click",()=>location.reload()); $("devUpdateServiceWorker")?.addEventListener("click",updateServiceWorker); $("devClearObsoleteCaches")?.addEventListener("click",clearObsoleteCaches); $("devCopyHealthSnapshot")?.addEventListener("click",exportHealth); $("devClearAppData")?.addEventListener("click",clearAppData);
     $("devPanel")?.addEventListener("pointerdown",resetInactivity,{passive:true}); $("devPanel")?.addEventListener("keydown",resetInactivity);
   }
-  window.addEventListener("error",e=>{
-    const message=String(e.message||e.error?.message||"Script error.");
-    const opaque=message==="Script error."&&!e.filename&&!e.lineno&&!e.colno&&!e.error;
-    const benign=/ResizeObserver loop (?:limit exceeded|completed with undelivered notifications)/i.test(message);
-    log(opaque?"browser-opaque-error":benign?"browser-observer-warning":"error",message,{source:e.filename||null,line:e.lineno||null,column:e.colno||null,error:serializeReason(e.error),interaction:lastInteraction,actionable:!(opaque||benign)});
-  });
-
-  document.addEventListener("pointerup",e=>{
-    const target=e.target?.closest?.("button,a,[role=button],input,select,textarea");
-    if(!target)return;
-    lastInteraction={time:new Date().toISOString(),tag:target.tagName,id:target.id||null,text:String(target.getAttribute("aria-label")||target.textContent||"").trim().slice(0,80)};
-  },true);
+  window.addEventListener("error",e=>log("error",e.message||"Script error",{source:e.filename||null,line:e.lineno||null,column:e.colno||null,error:serializeReason(e.error)}));
   window.addEventListener("unhandledrejection",e=>log("unhandledrejection",e.reason?.message||String(e.reason||"Unknown rejection"),serializeReason(e.reason)));
   window.addEventListener("securitypolicyviolation",e=>log("csp","Content Security Policy violation",{blockedURI:e.blockedURI,violatedDirective:e.violatedDirective,sourceFile:e.sourceFile,line:e.lineNumber,column:e.columnNumber}));
   window.addEventListener("animus:integrity-complete",e=>{window.ANIMUS_INTEGRITY_RESULT=e.detail;if(unlocked){renderSystem();renderHealth();}});
