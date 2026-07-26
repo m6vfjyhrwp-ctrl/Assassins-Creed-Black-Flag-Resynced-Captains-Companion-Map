@@ -880,7 +880,19 @@
   const legacyExportDiagnostics=$("exportDiagnostics"); if(legacyExportDiagnostics) legacyExportDiagnostics.onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
-  window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
+  let lastVisibleErrorKey = "", lastVisibleErrorAt = 0;
+  window.addEventListener("error", event => {
+    const message = String(event.message || event.error?.message || "Unknown error");
+    const opaqueSafariError = message === "Script error." && !event.filename && !event.lineno && !event.colno && !event.error;
+    const benignObserverError = /ResizeObserver loop (?:limit exceeded|completed with undelivered notifications)/i.test(message);
+    console.error(event.error || message);
+    if (opaqueSafariError || benignObserverError) return;
+    const key = `${message}|${event.filename || ""}|${event.lineno || 0}|${event.colno || 0}`;
+    const now = Date.now();
+    if (key === lastVisibleErrorKey && now - lastVisibleErrorAt < 5000) return;
+    lastVisibleErrorKey = key; lastVisibleErrorAt = now;
+    toast("An app action could not be completed. Details were saved in Developer Console logs.");
+  });
   $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);
   window.dispatchEvent(new CustomEvent("animus:app-ready"));
   setTimeout(() => $("bootScreen")?.classList.add("hide"), 350); setTimeout(() => $("bootScreen")?.remove(), 850);

@@ -1,13 +1,13 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.3.0",
+  "version": "7.3.1",
   "releaseChannel": "production",
-  "buildId": "animus-v7.3.0-20260725",
-  "buildDate": "2026-07-25",
+  "buildId": "animus-v7.3.1-20260726",
+  "buildDate": "2026-07-26",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
   "integrityManifestVersion": 2,
-  "serviceWorkerCache": "acbf-v7.3.0",
+  "serviceWorkerCache": "acbf-v7.3.1",
   "copyrightOwner": "Stephen Vare",
   "officialRepository": "m6vfjyhrwp-ctrl/Assassins-Creed-Black-Flag-Companion-Map"
 }

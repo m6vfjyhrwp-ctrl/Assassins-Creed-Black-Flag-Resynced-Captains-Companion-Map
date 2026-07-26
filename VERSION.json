@@ -1,11 +1,11 @@
 {
-  "version": "7.3.0",
-  "name": "Developer Console Health Dashboard",
+  "version": "7.3.1",
+  "name": "Error Diagnostics and Safari Event Hotfix",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
-  "released": "2026-07-25",
-  "buildId": "animus-v7.3.0-20260725",
+  "released": "2026-07-26",
+  "buildId": "animus-v7.3.1-20260726",
   "releaseChannel": "production",
   "integrityManifestVersion": 2
 }

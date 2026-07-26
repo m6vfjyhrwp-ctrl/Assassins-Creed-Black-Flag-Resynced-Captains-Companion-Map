@@ -1,4 +1,12 @@
-## 7.3.0 — Developer Console Health Dashboard
+# Animus Companion 7.3.1
+
+- Fixed repeated “A recoverable app error occurred” notifications caused by opaque iOS Safari `Script error.` events with no actionable source information.
+- Benign opaque Safari and ResizeObserver events remain recorded in Developer Console logs without interrupting normal controls.
+- Added interaction context to diagnostic error records.
+- Added duplicate-error suppression for genuine application exceptions.
+- Corrected stale v7.2.2 asset query strings in the v7.3.0 HTML shell and synchronized all runtime cache identifiers to v7.3.1.
+
+## 7.3.1 — Developer Console Health Dashboard
 
 - Added live module health and startup timeline panels.
 - Added navigation, paint, and resource performance readings.
