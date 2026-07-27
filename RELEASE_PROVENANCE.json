@@ -1,7 +1,7 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.4",
-  "buildId": "animus-v7.6.4-detail-sheet-scroll-repair-20260727",
+  "version": "7.6.5",
+  "buildId": "animus-v7.6.5-detail-sheet-layering-repair-20260727",
   "releaseChannel": "production",
   "milestone": "Location Detail Sheet Scroll and Touch Repair",
   "sourceBaseline": "7.6.3",

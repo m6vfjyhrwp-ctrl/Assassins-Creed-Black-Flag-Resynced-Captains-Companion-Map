@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.6.4";
+  const APP_VERSION = RELEASE.version || "7.6.5";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -506,7 +506,12 @@
       data.ui.nextObjectiveId = id; save(); renderMarkers(); openLocation(id); toast("Next objective updated");
     };
     $("sheetBackdrop").hidden = false;
-    requestAnimationFrame(() => { document.body.classList.add("sheet-open"); $("sheetBackdrop").classList.add("show"); $("detailSheet").classList.add("open"); });
+    requestAnimationFrame(() => {
+      document.body.classList.add("sheet-open");
+      $("sheetBackdrop").classList.add("show");
+      $("detailSheet").classList.add("open");
+      $("detailSheet").setAttribute("aria-hidden", "false");
+    });
     if (focus) focusLocation(location);
     renderMarkers(); setTimeout(addCorrectionButton, 0);
   }
@@ -516,7 +521,10 @@
     setTimeout(renderMarkers, 230);
   }
   function closeSheet() {
-    document.body.classList.remove("sheet-open"); $("sheetBackdrop").classList.remove("show"); $("detailSheet").classList.remove("open");
+    document.body.classList.remove("sheet-open");
+    $("sheetBackdrop").classList.remove("show");
+    $("detailSheet").classList.remove("open");
+    $("detailSheet").setAttribute("aria-hidden", "true");
     selectedId = null; data.ui.selectedId = null; save(); renderMarkers();
     setTimeout(() => $("sheetBackdrop").hidden = true, 240);
   }

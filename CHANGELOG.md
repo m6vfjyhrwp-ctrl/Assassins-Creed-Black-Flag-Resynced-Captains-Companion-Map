@@ -1,3 +1,7 @@
+## 7.6.5 — Location Detail Sheet Layering and Interaction Repair
+- Corrected detail-sheet/backdrop stacking so the sheet receives touch input.
+- Restored usable vertical scrolling and synchronized accessibility state.
+
 ## 7.6.4 — Location Detail Sheet Scroll and Touch Repair
 
 - Restored scrollable location descriptions on touch devices.

@@ -1,11 +1,11 @@
 {
-  "version": "7.6.4",
-  "name": "Location Detail Sheet Scroll and Touch Repair",
+  "version": "7.6.5",
+  "name": "Location Detail Sheet Layering and Interaction Repair",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
   "released": "2026-07-27",
-  "buildId": "animus-v7.6.4-detail-sheet-scroll-repair-20260727",
+  "buildId": "animus-v7.6.5-detail-sheet-layering-repair-20260727",
   "releaseChannel": "production",
   "integrityManifestVersion": 2,
   "buildDate": "2026-07-27"

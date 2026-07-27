@@ -553,7 +553,9 @@ body:not(.map-tab-active) .app-panel.active{position:relative!important;z-index:
 /* Ensure sheets and floating controls never fall behind the persistent dock. */
 #mapPanel .location-browser{z-index:170!important}
 .detail-sheet{z-index:180!important}
-.modal-backdrop,.sheet-backdrop{z-index:190}
+.modal-backdrop{z-index:190}
+.sheet-backdrop{z-index:175}
+.detail-sheet{z-index:180!important;pointer-events:auto}
 .drawer{z-index:200}
 .toast{z-index:220}
 
@@ -669,3 +671,11 @@ body:not(.map-tab-active) .app-panel.active{position:relative!important;z-index:
 /* v7.6.4 — Location Detail Sheet Scroll and Touch Repair */
 .detail-content:focus-visible{outline:2px solid var(--gold2);outline-offset:-3px}
 @media (prefers-reduced-motion:reduce){.detail-sheet{transition:none}}
+
+
+/* v7.6.5 — Location Detail Sheet Layering and Interaction Repair */
+.sheet-backdrop{z-index:175!important;pointer-events:auto}
+.detail-sheet{z-index:180!important;pointer-events:auto}
+.detail-sheet.open{visibility:visible}
+.detail-content{position:relative;z-index:1;pointer-events:auto;touch-action:pan-y pinch-zoom}
+.sheet-handle{position:relative;z-index:2;pointer-events:auto}

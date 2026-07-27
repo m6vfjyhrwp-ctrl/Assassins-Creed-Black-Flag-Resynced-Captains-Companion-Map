@@ -1,6 +1,6 @@
 {
-  "name": "Animus Companion 7.6.4 Location Detail Sheet Scroll and Touch Repair",
-  "short_name": "Animus 7.6.4",
+  "name": "Animus Companion 7.6.5 Location Detail Sheet Layering and Interaction Repair",
+  "short_name": "Animus 7.6.5",
   "description": "Production map interface with restored iPhone scrolling and touch handling in location detail sheets.",
   "start_url": "./",
   "scope": "./",
