@@ -1,12 +1,12 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.8.1",
-  "buildId": "animus-v7.6.8.1-route-planner-viewport-refinement-20260727",
+  "version": "7.6.9",
+  "buildId": "animus-v7.6.9-route-planner-viewport-refinement-20260727",
   "releaseChannel": "production",
   "milestone": "Responsive Overlay and Map Action Repair",
   "sourceBaseline": "7.6.3",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
   "buildDate": "2026-07-27",
-  "releaseName": "Route Planner Viewport Refinement"
+  "releaseName": "Phase 1 Route Planner Finalization"
 }

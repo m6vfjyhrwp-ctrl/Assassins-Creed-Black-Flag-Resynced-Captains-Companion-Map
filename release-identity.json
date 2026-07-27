@@ -1,13 +1,13 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.8.1",
+  "version": "7.6.9",
   "releaseChannel": "production",
-  "buildId": "animus-v7.6.8.1-route-planner-viewport-refinement-20260727",
+  "buildId": "animus-v7.6.9-phase-1-route-planner-finalization-20260727",
   "buildDate": "2026-07-27",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
   "integrityManifestVersion": 2,
-  "serviceWorkerCache": "acbf-v7.6.8.1-route-planner-viewport-refinement",
+  "serviceWorkerCache": "acbf-v7.6.9-phase-1-route-planner-finalization",
   "copyrightOwner": "Stephen Vare",
   "officialRepository": "m6vfjyhrwp-ctrl/Assassins-Creed-Black-Flag-Companion-Map"
 }

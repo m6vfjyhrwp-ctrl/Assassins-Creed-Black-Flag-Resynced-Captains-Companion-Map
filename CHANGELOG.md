@@ -1,4 +1,4 @@
-# v7.6.8.1 — Route Planner Viewport Refinement
+# v7.6.9 — Phase 1 Route Planner Finalization
 
 - Enlarged route planner to show three route stops before scrolling on standard iPhone portrait viewports.
 
@@ -219,6 +219,9 @@
 - Expanded onboarding into a four-step introduction covering the app purpose, map gestures, planning tools, local storage, backups, offline use, and replay access.
 - Preserved Developer Console v1, all 104 records, marker IDs, routes, progress, calibration, database version 9, user-data schema 3, and storage-key compatibility.
 
-## 7.6.8.1
+## 7.6.9
 - Completed the route-stop card interface and iPhone-compatible manual reordering.
 - Added Optimize Route and cleaned up route actions.
+
+## 7.6.9
+- Finalized Phase 1 route cards with unified descriptive drag controls and full labels.

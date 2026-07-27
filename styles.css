@@ -800,3 +800,16 @@ body.route-reordering #mapPanel .route-summary{overscroll-behavior:none}
   #mapPanel .route-summary{max-height:min(60dvh,470px)!important;}
   #mapPanel .route-summary .route-stop-list{max-height:250px;}
 }
+
+
+/* v7.6.9 — Phase 1 completion: unified descriptive drag cards */
+#mapPanel .route-summary .route-stop-card{grid-template-columns:32px minmax(0,1fr) 44px!important;gap:7px!important}
+#mapPanel .route-summary .route-drag-handle.route-stop-open{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;min-width:0!important;padding:8px 11px!important;text-align:left!important;cursor:grab;touch-action:pan-y;border-color:#395459!important;background:#0b1b1e!important;color:var(--text)!important}
+#mapPanel .route-summary .route-drag-handle.route-stop-open:active{cursor:grabbing}
+#mapPanel .route-summary .route-grip{flex:0 0 auto;color:var(--gold2);font-size:1.05rem;line-height:1}
+#mapPanel .route-summary .route-stop-label{min-width:0;display:block;line-height:1.28;overflow-wrap:anywhere}
+#mapPanel .route-summary .route-stop-label b{font-size:.79rem;white-space:normal;overflow:visible;text-overflow:clip}
+#mapPanel .route-summary .route-stop-label small{color:var(--muted);font-size:.7rem;white-space:nowrap}
+#mapPanel .route-summary .route-label-separator{color:var(--muted)}
+#mapPanel .route-summary .route-stop-remove{min-width:44px!important}
+@media(max-width:380px){#mapPanel .route-summary .route-stop-card{grid-template-columns:28px minmax(0,1fr) 42px!important;gap:4px!important}#mapPanel .route-summary .route-drag-handle.route-stop-open{gap:7px!important;padding-inline:8px!important}.route-label-separator{display:none}.route-stop-label small{display:block;margin-top:2px}}

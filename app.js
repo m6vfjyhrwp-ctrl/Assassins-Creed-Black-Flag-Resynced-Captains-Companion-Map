@@ -612,11 +612,11 @@
   }
   function bindRouteReordering() {
     const list = $("routeStopList"); if (!list) return;
-    let dragId = null, pointerId = null, ghost = null, activeItem = null;
+    let dragId = null, pointerId = null, ghost = null, activeItem = null, dragStarted = false, startX = 0, startY = 0;
     const cleanup = () => {
       activeItem?.classList.remove("dragging");
       document.querySelectorAll("#routeStopList li.drop-target").forEach(item => item.classList.remove("drop-target"));
-      ghost?.remove(); ghost = null; activeItem = null; dragId = null; pointerId = null;
+      ghost?.remove(); ghost = null; activeItem = null; dragId = null; pointerId = null; dragStarted = false;
       document.body.classList.remove("route-reordering");
     };
     list.querySelectorAll("li").forEach(li => {
@@ -628,23 +628,32 @@
       const handle = li.querySelector(".route-drag-handle");
       handle?.addEventListener("pointerdown", event => {
         if (event.pointerType === "mouse") return;
-        event.preventDefault(); dragId = li.dataset.routeId; pointerId = event.pointerId; activeItem = li;
-        handle.setPointerCapture?.(pointerId); li.classList.add("dragging"); document.body.classList.add("route-reordering");
-        ghost = li.cloneNode(true); ghost.className = "route-stop-card route-drag-ghost"; ghost.setAttribute("aria-hidden", "true"); document.body.appendChild(ghost);
-        const moveGhost = e => ghost.style.transform = `translate3d(${Math.max(8,e.clientX-ghost.offsetWidth/2)}px,${Math.max(8,e.clientY-28)}px,0)`;
-        moveGhost(event);
+        dragId = li.dataset.routeId; pointerId = event.pointerId; activeItem = li; startX = event.clientX; startY = event.clientY; dragStarted = false;
+        handle.setPointerCapture?.(pointerId);
+        const beginDrag = e => {
+          if (dragStarted) return;
+          dragStarted = true; e.preventDefault();
+          li.classList.add("dragging"); document.body.classList.add("route-reordering");
+          ghost = li.cloneNode(true); ghost.className = "route-stop-card route-drag-ghost"; ghost.setAttribute("aria-hidden", "true"); document.body.appendChild(ghost);
+        };
+        const moveGhost = e => { if (ghost) ghost.style.transform = `translate3d(${Math.max(8,e.clientX-ghost.offsetWidth/2)}px,${Math.max(8,e.clientY-28)}px,0)`; };
         const move = e => {
-          if (e.pointerId !== pointerId) return; e.preventDefault(); moveGhost(e);
+          if (e.pointerId !== pointerId) return;
+          if (!dragStarted && Math.hypot(e.clientX-startX,e.clientY-startY) < 9) return;
+          beginDrag(e); e.preventDefault(); moveGhost(e);
           document.querySelectorAll("#routeStopList li.drop-target").forEach(item => item.classList.remove("drop-target"));
           const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#routeStopList li");
           if (target && target !== li) target.classList.add("drop-target");
-          const panel = $("routeSummary"), r = panel?.getBoundingClientRect();
-          if (panel && r) { if (e.clientY < r.top + 70) panel.scrollTop -= 9; else if (e.clientY > r.bottom - 90) panel.scrollTop += 9; }
+          const stopList = $("routeStopList"), r = stopList?.getBoundingClientRect();
+          if (stopList && r) { if (e.clientY < r.top + 55) stopList.scrollTop -= 10; else if (e.clientY > r.bottom - 55) stopList.scrollTop += 10; }
         };
         const finish = e => {
           if (e.pointerId !== pointerId) return;
-          const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#routeStopList li");
-          if (target && target !== li) { const box = target.getBoundingClientRect(); reorderRoute(dragId, target.dataset.routeId, e.clientY > box.top + box.height / 2); }
+          if (dragStarted) {
+            e.preventDefault();
+            const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#routeStopList li");
+            if (target && target !== li) { const box = target.getBoundingClientRect(); reorderRoute(dragId, target.dataset.routeId, e.clientY > box.top + box.height / 2); }
+          }
           cleanup();
         };
         handle.addEventListener("pointermove", move);
@@ -663,7 +672,7 @@
     if (!route.length) { $("routeSummary").hidden = true; $("routeSummary").innerHTML = ""; return; }
     const distance = routeDistance(route), warnings = unique(route.flatMap(location => locationReadiness(location).missing));
     $("routeSummary").hidden = false;
-    $("routeSummary").innerHTML = `<header class="route-planner-header"><div><strong>${route.length} route stop${route.length === 1 ? "" : "s"}</strong><small>${distance.toFixed(1)} map units • about ${Math.max(5, Math.round(distance * 1.6))} min sailing</small></div><button id="closeRouteSummary" class="route-close" aria-label="Hide route planner">⌄</button></header>${warnings.length ? `<p class="route-warning">⚠ ${esc(warnings.slice(0, 4).join(" • "))}</p>` : ""}<ol id="routeStopList" class="route-stop-list">${route.map((location,index) => `<li class="route-stop-card" draggable="true" data-route-id="${location.id}"><span class="route-stop-number" aria-hidden="true">${index + 1}</span><button class="route-drag-handle" aria-label="Drag ${esc(location.name)} to reorder" title="Drag to reorder">☰</button><button class="route-stop-open" data-route-open="${location.id}"><b>${esc(location.name)}</b><small>${esc(location.gameCoordinates)}</small></button><button class="route-stop-remove" data-route-remove="${location.id}" aria-label="Remove ${esc(location.name)} from route">✕</button></li>`).join("")}</ol><div class="route-actions"><button id="reverseRouteInline">Reverse</button><button id="optimizeRouteInline">Optimize</button><button id="clearRouteInline" class="danger">Clear route</button></div>`;
+    $("routeSummary").innerHTML = `<header class="route-planner-header"><div><strong>${route.length} route stop${route.length === 1 ? "" : "s"}</strong><small>${distance.toFixed(1)} map units • about ${Math.max(5, Math.round(distance * 1.6))} min sailing</small></div><button id="closeRouteSummary" class="route-close" aria-label="Hide route planner">⌄</button></header>${warnings.length ? `<p class="route-warning">⚠ ${esc(warnings.slice(0, 4).join(" • "))}</p>` : ""}<ol id="routeStopList" class="route-stop-list">${route.map((location,index) => `<li class="route-stop-card" draggable="true" data-route-id="${location.id}"><span class="route-stop-number" aria-hidden="true">${index + 1}</span><button class="route-drag-handle route-stop-open" data-route-open="${location.id}" aria-label="${esc(location.name)}, ${esc(location.gameCoordinates)}. Drag to reorder or tap to open"><span class="route-grip" aria-hidden="true">☰</span><span class="route-stop-label"><b>${esc(location.name)}</b><span class="route-label-separator" aria-hidden="true"> — </span><small>${esc(location.gameCoordinates)}</small></span></button><button class="route-stop-remove" data-route-remove="${location.id}" aria-label="Remove ${esc(location.name)} from route">✕</button></li>`).join("")}</ol><div class="route-actions"><button id="reverseRouteInline">Reverse</button><button id="optimizeRouteInline">Optimize</button><button id="clearRouteInline" class="danger">Clear route</button></div>`;
     document.querySelectorAll("[data-route-open]").forEach(button => button.onclick = () => openLocation(button.dataset.routeOpen, true));
     document.querySelectorAll("[data-route-remove]").forEach(button => button.onclick = () => { data.route.ids=data.route.ids.filter(id=>id!==button.dataset.routeRemove); save(); drawRoute(); renderMarkers(); toast("Route stop removed"); });
     bindRouteReordering();

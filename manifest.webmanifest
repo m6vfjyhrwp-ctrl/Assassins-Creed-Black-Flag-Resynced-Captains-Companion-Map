@@ -1,6 +1,6 @@
 {
-  "name": "Animus Companion 7.6.8.1 Route Planner Completion",
-  "short_name": "Animus 7.6.8.1",
+  "name": "Animus Companion 7.6.9 Phase 1 Route Planner Finalization",
+  "short_name": "Animus 7.6.9",
   "description": "Production map interface with restored marker-sheet touch handling and isolated route controls.",
   "start_url": "./",
   "scope": "./",
