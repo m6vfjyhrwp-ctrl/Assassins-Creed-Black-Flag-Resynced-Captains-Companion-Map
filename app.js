@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.6.3";
+  const APP_VERSION = RELEASE.version || "7.6.4";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -481,6 +481,7 @@
       ${state.screenshot ? `<h3>Reference Screenshot</h3><div class="saved-screenshot"><img src="${state.screenshot}" alt="Saved reference for ${esc(location.name)}"><button id="removeScreenshot" class="danger">Remove screenshot</button></div>` : ""}
       <h3>Captain’s Notes</h3><textarea id="noteField" rows="4" placeholder="Your private notes…">${esc(state.note)}</textarea>
     `;
+    $("detailContent").scrollTop = 0;
     $("closeSheetButton").onclick = closeSheet;
     $("statusSelect").onchange = event => {
       const previous = state.status;
@@ -1016,8 +1017,9 @@
   $("fullScreenButton").onclick = enterFullScreen; $("exitFullScreenButton").onclick = exitFullScreen;
   $("viewport").addEventListener("click", event => { if (event.target.closest("button")) return; if (!document.body.classList.contains("app-fullscreen")) enterFullScreen(); });
   $("sheetBackdrop").onclick = closeSheet; $("sheetHandle").onclick = cycleSheet;
-  $("detailSheet").addEventListener("touchstart", event => { sheetTouchStart = event.touches[0]?.clientY || null; }, { passive: true });
-  $("detailSheet").addEventListener("touchend", event => { if (sheetTouchStart == null) return; const dy = (event.changedTouches[0]?.clientY || sheetTouchStart) - sheetTouchStart; sheetTouchStart = null; if (dy > 90) { const size = $("detailSheet").dataset.size; if (size === "full") $("detailSheet").dataset.size = "half"; else if (size === "half") $("detailSheet").dataset.size = "compact"; else closeSheet(); } else if (dy < -90) cycleSheet(); }, { passive: true });
+  $("sheetHandle").addEventListener("touchstart", event => { sheetTouchStart = event.touches[0]?.clientY ?? null; }, { passive: true });
+  $("sheetHandle").addEventListener("touchend", event => { if (sheetTouchStart == null) return; const endY = event.changedTouches[0]?.clientY ?? sheetTouchStart; const dy = endY - sheetTouchStart; sheetTouchStart = null; if (dy > 70) { const size = $("detailSheet").dataset.size; if (size === "full") $("detailSheet").dataset.size = "half"; else if (size === "half") $("detailSheet").dataset.size = "compact"; else closeSheet(); save(); } else if (dy < -70) cycleSheet(); }, { passive: true });
+  $("detailContent").addEventListener("touchstart", event => event.stopPropagation(), { passive: true });
   document.querySelectorAll(".tab").forEach(tab => tab.onclick = () => switchTab(tab.dataset.tab));
   window.addEventListener("acbf:map-reset", resetTemporaryMapState);
   window.addEventListener("acbf:map-change", () => { renderMarkers(); clearTimeout(window.__mapSaveTimer); window.__mapSaveTimer=setTimeout(save,180); });

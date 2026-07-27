@@ -1,13 +1,13 @@
 {
-  "name": "Animus Companion 7.6.3 Constrained POI Dropdown Repair",
-  "short_name": "Animus 7.6.3",
-  "description": "Production map interface with an accessible expandable summary of applied POI categories and filters.",
+  "name": "Animus Companion 7.6.4 Location Detail Sheet Scroll and Touch Repair",
+  "short_name": "Animus 7.6.4",
+  "description": "Production map interface with restored iPhone scrolling and touch handling in location detail sheets.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#030708",
   "theme_color": "#050a0b",
-  "id": "./?pwa=v762",
+  "id": "./?pwa=v764",
   "categories": [
     "games",
     "utilities"

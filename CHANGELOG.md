@@ -1,3 +1,10 @@
+## 7.6.4 — Location Detail Sheet Scroll and Touch Repair
+
+- Restored scrollable location descriptions on touch devices.
+- Isolated sheet resize gestures to the drag handle.
+- Added iOS momentum scrolling and overscroll containment.
+- Preserved database, calibration, Navigation First, POI dropdown, routes, and saved-data compatibility.
+
 # Changelog
 
 ## 7.6.3 — Constrained POI Dropdown Repair

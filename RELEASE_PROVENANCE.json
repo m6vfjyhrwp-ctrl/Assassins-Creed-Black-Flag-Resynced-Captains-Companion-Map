@@ -1,10 +1,10 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.2",
-  "buildId": "animus-v7.6.2-poi-summary-dropdown-20260727",
+  "version": "7.6.4",
+  "buildId": "animus-v7.6.4-detail-sheet-scroll-repair-20260727",
   "releaseChannel": "production",
-  "milestone": "Expandable POI Summary Dropdown",
-  "sourceBaseline": "7.6.1",
+  "milestone": "Location Detail Sheet Scroll and Touch Repair",
+  "sourceBaseline": "7.6.3",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
   "buildDate": "2026-07-27"
