@@ -1,9 +1,9 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.5",
-  "buildId": "animus-v7.6.5-detail-sheet-layering-repair-20260727",
+  "version": "7.6.6",
+  "buildId": "animus-v7.6.6-responsive-overlay-action-repair-20260727",
   "releaseChannel": "production",
-  "milestone": "Location Detail Sheet Scroll and Touch Repair",
+  "milestone": "Responsive Overlay and Map Action Repair",
   "sourceBaseline": "7.6.3",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,

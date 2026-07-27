@@ -10,14 +10,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="apple-mobile-web-app-title" content="Animus Companion">
-  <script src="./startup-guard.js?v=7.6.5"></script>
-  <title>Animus Companion 7.6.5 — Location Detail Sheet Layering and Interaction Repair</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=7.6.5">
+  <script src="./startup-guard.js?v=7.6.6"></script>
+  <title>Animus Companion 7.6.6 — Responsive Overlay and Map Action Repair</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=7.6.6">
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
-  <link rel="stylesheet" href="./styles.css?v=7.6.5">
+  <link rel="stylesheet" href="./styles.css?v=7.6.6">
 </head>
 <body>
   <div id="bootScreen" class="boot-screen" aria-label="Loading Animus Companion">
@@ -32,7 +32,7 @@
     </button>
     <div class="header-actions">
       <button id="globalSearchButton" class="icon-button" type="button" aria-label="Search">⌕</button>
-      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.6.5 <small id="releaseStatusText">Integrity Not Verified</small></button>
+      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.6.6 <small id="releaseStatusText">Integrity Not Verified</small></button>
     </div>
   </header>
 
@@ -70,14 +70,11 @@
               <button id="filterButton" class="icon-button" type="button" aria-label="Filters">☷</button>
               <button id="scanButton" class="icon-button" type="button" aria-label="Animus Scan">⌁</button>
               <button id="routeButton" class="icon-button toolbar-priority" type="button" aria-label="Route planner">⌘</button>
-              <button id="fullScreenButton" class="icon-button toolbar-priority" type="button" aria-label="Full screen map">⛶</button>
               <button id="moreActionsButton" class="icon-button more-actions-button" type="button" aria-label="More map actions" aria-expanded="false" aria-controls="moreActionsMenu">•••</button>
-              <button id="exitFullScreenButton" class="icon-button exit-fullscreen" type="button" aria-label="Exit full screen">✕</button>
               <div id="moreActionsMenu" class="more-actions-menu" hidden role="menu" aria-label="More map actions">
                 <button type="button" role="menuitem" data-more-action="filters">Filters</button>
                 <button type="button" role="menuitem" data-more-action="scan">Animus Scan</button>
                 <button type="button" role="menuitem" data-more-action="route">Route planner</button>
-                <button type="button" role="menuitem" data-more-action="fullscreen">Full-screen map</button>
                 <button type="button" role="menuitem" data-more-action="nearest">Nearest objective</button>
               </div>
             </div>
@@ -202,6 +199,6 @@
     <div id="detailContent" class="detail-content" tabindex="0" aria-label="Location details"></div>
   </aside>
 
-  <script src="./release-identity.js?v=7.6.5"></script><script src="./database.js?v=7.6.5"></script><script src="./engine.js?v=7.6.5"></script><script src="./integrity.js?v=7.6.5"></script><script src="./app.js?v=7.6.5"></script><script src="./developer-console.js?v=7.6.5"></script>
+  <script src="./release-identity.js?v=7.6.6"></script><script src="./database.js?v=7.6.6"></script><script src="./engine.js?v=7.6.6"></script><script src="./integrity.js?v=7.6.6"></script><script src="./app.js?v=7.6.6"></script><script src="./developer-console.js?v=7.6.6"></script>
 </body>
 </html>

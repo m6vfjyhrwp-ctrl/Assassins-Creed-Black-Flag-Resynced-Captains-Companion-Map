@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.6.5";
+  const APP_VERSION = RELEASE.version || "7.6.6";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -506,12 +506,7 @@
       data.ui.nextObjectiveId = id; save(); renderMarkers(); openLocation(id); toast("Next objective updated");
     };
     $("sheetBackdrop").hidden = false;
-    requestAnimationFrame(() => {
-      document.body.classList.add("sheet-open");
-      $("sheetBackdrop").classList.add("show");
-      $("detailSheet").classList.add("open");
-      $("detailSheet").setAttribute("aria-hidden", "false");
-    });
+    requestAnimationFrame(() => { document.body.classList.add("sheet-open"); $("sheetBackdrop").classList.add("show"); $("detailSheet").classList.add("open"); });
     if (focus) focusLocation(location);
     renderMarkers(); setTimeout(addCorrectionButton, 0);
   }
@@ -521,10 +516,7 @@
     setTimeout(renderMarkers, 230);
   }
   function closeSheet() {
-    document.body.classList.remove("sheet-open");
-    $("sheetBackdrop").classList.remove("show");
-    $("detailSheet").classList.remove("open");
-    $("detailSheet").setAttribute("aria-hidden", "true");
+    document.body.classList.remove("sheet-open"); $("sheetBackdrop").classList.remove("show"); $("detailSheet").classList.remove("open");
     selectedId = null; data.ui.selectedId = null; save(); renderMarkers();
     setTimeout(() => $("sheetBackdrop").hidden = true, 240);
   }
@@ -969,10 +961,19 @@
   function toggleMoreActions(){const menu=$("moreActionsMenu");if(!menu)return;if(menu.hidden)openMoreActions();else closeMoreActions();}
 
   // Events
+  document.body.classList.remove("app-fullscreen");
   $("poiSummaryButton").addEventListener("click", event => { event.stopPropagation(); togglePoiSummary(); });
   $("poiSummaryDropdown").addEventListener("click", event => event.stopPropagation());
-  $("poiSummaryClear").onclick = () => { data.filters = clone(defaults.filters); query = ""; data.ui.query = ""; $("locationSearch").value = ""; save(); renderAll(); setPoiSummaryOpen(false, { restoreFocus: true }); toast("Map filters cleared"); };
-  $("poiSummaryOpenFilters").onclick = () => { setPoiSummaryOpen(false); openDrawer("filterDrawer"); };
+  $("poiSummaryClear").addEventListener("click", event => {
+    event.preventDefault(); event.stopPropagation();
+    data.filters = clone(defaults.filters); query = ""; data.ui.query = ""; $("locationSearch").value = "";
+    save(); renderAll(); setPoiSummaryOpen(false, { restoreFocus: true }); toast("Map filters cleared");
+  });
+  $("poiSummaryOpenFilters").addEventListener("click", event => {
+    event.preventDefault(); event.stopPropagation();
+    setPoiSummaryOpen(false);
+    requestAnimationFrame(() => openDrawer("filterDrawer"));
+  });
   document.addEventListener("pointerdown", event => { if (!event.target.closest(".poi-summary-control")) setPoiSummaryOpen(false); }, true);
   document.addEventListener("keydown", event => { if (event.key === "Escape" && !$("poiSummaryDropdown").hidden) { event.preventDefault(); setPoiSummaryOpen(false, { restoreFocus: true }); } });
   let searchRenderTimer=0;
@@ -1008,7 +1009,7 @@
   const moreButton=$("moreActionsButton"), moreMenu=$("moreActionsMenu");
   moreButton.addEventListener("pointerup",event=>{event.preventDefault();event.stopPropagation();toggleMoreActions();});
   moreButton.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();});
-  moreMenu.addEventListener("click",event=>{const action=event.target.closest("[data-more-action]")?.dataset.moreAction;if(!action)return;event.stopPropagation();closeMoreActions();if(action==="filters")openDrawer("filterDrawer");if(action==="scan")runScan();if(action==="route")openDrawer("routeDrawer");if(action==="fullscreen")enterFullScreen();if(action==="nearest")nearestToMapCenter();});
+  moreMenu.addEventListener("click",event=>{const action=event.target.closest("[data-more-action]")?.dataset.moreAction;if(!action)return;event.stopPropagation();closeMoreActions();if(action==="filters")openDrawer("filterDrawer");if(action==="scan")runScan();if(action==="route")openDrawer("routeDrawer");if(action==="nearest")nearestToMapCenter();});
   moreMenu.addEventListener("keydown",event=>{const items=[...moreMenu.querySelectorAll('[role="menuitem"]')],index=items.indexOf(document.activeElement);if(event.key==="Escape"){event.preventDefault();closeMoreActions({restoreFocus:true});}else if(event.key==="ArrowDown"){event.preventDefault();items[(index+1+items.length)%items.length]?.focus();}else if(event.key==="ArrowUp"){event.preventDefault();items[(index-1+items.length)%items.length]?.focus();}});
   document.addEventListener("pointerdown",event=>{if(performance.now()-moreActionsOpenedAt<120)return;if(!event.target.closest("#moreActionsMenu")&&!event.target.closest("#moreActionsButton"))closeMoreActions();},true);
   window.addEventListener("resize",positionMoreActions);
@@ -1022,8 +1023,6 @@
     try{const bitmap=await createImageBitmap(file);const max=1600,scale=Math.min(1,max/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement("canvas");canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);canvas.getContext("2d").drawImage(bitmap,0,0,canvas.width,canvas.height);const result=canvas.toDataURL("image/jpeg",.78);const estimate=await navigator.storage?.estimate?.();if(estimate?.quota&&estimate.usage+result.length*0.75>estimate.quota*.92)throw new Error("Not enough local storage");stateFor(id).screenshot=result;save();closeMarkerContext();toast("Screenshot compressed and saved locally");if(selectedId===id)openLocation(id)}catch(error){toast(error.message||"Screenshot could not be saved")}finally{event.target.value=""}
   };
   document.addEventListener("pointerdown", event => { if (!event.target.closest("#markerContextMenu") && !event.target.closest(".marker")) closeMarkerContext(); });
-  $("fullScreenButton").onclick = enterFullScreen; $("exitFullScreenButton").onclick = exitFullScreen;
-  $("viewport").addEventListener("click", event => { if (event.target.closest("button")) return; if (!document.body.classList.contains("app-fullscreen")) enterFullScreen(); });
   $("sheetBackdrop").onclick = closeSheet; $("sheetHandle").onclick = cycleSheet;
   $("sheetHandle").addEventListener("touchstart", event => { sheetTouchStart = event.touches[0]?.clientY ?? null; }, { passive: true });
   $("sheetHandle").addEventListener("touchend", event => { if (sheetTouchStart == null) return; const endY = event.changedTouches[0]?.clientY ?? sheetTouchStart; const dy = endY - sheetTouchStart; sheetTouchStart = null; if (dy > 70) { const size = $("detailSheet").dataset.size; if (size === "full") $("detailSheet").dataset.size = "half"; else if (size === "half") $("detailSheet").dataset.size = "compact"; else closeSheet(); save(); } else if (dy < -70) cycleSheet(); }, { passive: true });

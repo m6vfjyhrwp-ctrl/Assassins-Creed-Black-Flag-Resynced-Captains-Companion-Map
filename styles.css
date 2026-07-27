@@ -553,9 +553,7 @@ body:not(.map-tab-active) .app-panel.active{position:relative!important;z-index:
 /* Ensure sheets and floating controls never fall behind the persistent dock. */
 #mapPanel .location-browser{z-index:170!important}
 .detail-sheet{z-index:180!important}
-.modal-backdrop{z-index:190}
-.sheet-backdrop{z-index:175}
-.detail-sheet{z-index:180!important;pointer-events:auto}
+.modal-backdrop,.sheet-backdrop{z-index:190}
 .drawer{z-index:200}
 .toast{z-index:220}
 
@@ -672,10 +670,60 @@ body:not(.map-tab-active) .app-panel.active{position:relative!important;z-index:
 .detail-content:focus-visible{outline:2px solid var(--gold2);outline-offset:-3px}
 @media (prefers-reduced-motion:reduce){.detail-sheet{transition:none}}
 
+/* v7.6.6 responsive overlays and obsolete fullscreen removal */
+#fullScreenButton,#exitFullScreenButton,[data-more-action="fullscreen"]{display:none!important}
 
-/* v7.6.5 — Location Detail Sheet Layering and Interaction Repair */
-.sheet-backdrop{z-index:175!important;pointer-events:auto}
-.detail-sheet{z-index:180!important;pointer-events:auto}
-.detail-sheet.open{visibility:visible}
-.detail-content{position:relative;z-index:1;pointer-events:auto;touch-action:pan-y pinch-zoom}
-.sheet-handle{position:relative;z-index:2;pointer-events:auto}
+/* Route summary is a clean, centered overlay above the navigation dock. */
+#mapPanel .route-summary{
+  position:fixed!important;
+  z-index:88!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:calc(var(--ui-bottom) + 14px)!important;
+  transform:translateX(-50%)!important;
+  width:min(92vw,560px)!important;
+  max-height:min(42dvh,390px)!important;
+  overflow:auto!important;
+  padding:12px!important;
+  border:1px solid #3b565b!important;
+  border-radius:16px!important;
+  background:linear-gradient(155deg,rgba(8,20,23,.985),rgba(4,12,14,.985))!important;
+  box-shadow:0 18px 44px #000c!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+}
+#mapPanel .route-summary[hidden]{display:none!important}
+#mapPanel .route-summary .route-actions{
+  position:sticky;
+  bottom:-12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:8px -12px -12px;
+  padding:12px;
+  background:#061012f5;
+  border-top:1px solid #2d4346;
+}
+#mapPanel .route-summary .route-actions button{width:100%;margin:0;min-height:44px;text-align:center}
+body.sheet-open #mapPanel .route-summary{bottom:calc(34dvh + 18px)!important}
+body.browser-open #mapPanel .route-summary{bottom:calc(var(--ui-bottom) + 14px)!important}
+
+/* Status messages remain screen-centered and never clip against the left edge. */
+.toast{
+  left:50%!important;
+  right:auto!important;
+  width:max-content!important;
+  max-width:min(88vw,430px)!important;
+  transform:translateX(-50%)!important;
+  text-align:center;
+  justify-content:center;
+}
+.toast.toast-leaving{transform:translate(-50%,8px)!important}
+body.sheet-open .toast{bottom:max(calc(34dvh + 20px),calc(var(--ui-bottom) + 16px))!important}
+
+.poi-summary-dropdown,.poi-summary-actions,.poi-summary-actions button{pointer-events:auto!important}
+.poi-summary-actions button{touch-action:manipulation;cursor:pointer}
+
+@media(max-width:520px){
+  #mapPanel .route-summary{width:calc(100vw - 24px)!important;max-height:36dvh!important}
+}
