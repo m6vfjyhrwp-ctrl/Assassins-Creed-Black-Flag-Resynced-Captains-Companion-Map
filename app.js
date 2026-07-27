@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.6.7";
+  const APP_VERSION = RELEASE.version || "7.6.8";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -592,28 +592,85 @@
     data.route.ids = candidates.map(location => location.id);
     save(); drawRoute(); renderAll(); closeDrawer("routeDrawer"); toast(`Route built with ${candidates.length} visible stop${candidates.length === 1 ? "" : "s"}`);
   }
+  function reorderRoute(fromId, toId, placeAfter = false) {
+    if (!fromId || !toId || fromId === toId) return false;
+    const ids = [...data.route.ids];
+    const from = ids.indexOf(fromId);
+    if (from < 0 || ids.indexOf(toId) < 0) return false;
+    const [moved] = ids.splice(from, 1);
+    const to = ids.indexOf(toId) + (placeAfter ? 1 : 0);
+    ids.splice(Math.max(0, Math.min(ids.length, to)), 0, moved);
+    data.route.ids = ids;
+    save(); drawRoute(); renderMarkers(); toast("Route reordered");
+    return true;
+  }
+  function optimizeCurrentRoute() {
+    const route = data.route.ids.map(byId).filter(Boolean);
+    if (route.length < 3) return toast("Add at least three stops to optimize the route");
+    data.route.ids = improveRoute2Opt(nearestRoute(route)).map(location => location.id);
+    save(); drawRoute(); renderMarkers(); toast("Route optimized");
+  }
+  function bindRouteReordering() {
+    const list = $("routeStopList"); if (!list) return;
+    let dragId = null, pointerId = null, ghost = null, activeItem = null;
+    const cleanup = () => {
+      activeItem?.classList.remove("dragging");
+      document.querySelectorAll("#routeStopList li.drop-target").forEach(item => item.classList.remove("drop-target"));
+      ghost?.remove(); ghost = null; activeItem = null; dragId = null; pointerId = null;
+      document.body.classList.remove("route-reordering");
+    };
+    list.querySelectorAll("li").forEach(li => {
+      li.ondragstart = event => { dragId = li.dataset.routeId; li.classList.add("dragging"); event.dataTransfer?.setData("text/plain", dragId); };
+      li.ondragend = cleanup;
+      li.ondragover = event => { event.preventDefault(); li.classList.add("drop-target"); };
+      li.ondragleave = () => li.classList.remove("drop-target");
+      li.ondrop = event => { event.preventDefault(); const id = dragId || event.dataTransfer?.getData("text/plain"); const box = li.getBoundingClientRect(); reorderRoute(id, li.dataset.routeId, event.clientY > box.top + box.height / 2); cleanup(); };
+      const handle = li.querySelector(".route-drag-handle");
+      handle?.addEventListener("pointerdown", event => {
+        if (event.pointerType === "mouse") return;
+        event.preventDefault(); dragId = li.dataset.routeId; pointerId = event.pointerId; activeItem = li;
+        handle.setPointerCapture?.(pointerId); li.classList.add("dragging"); document.body.classList.add("route-reordering");
+        ghost = li.cloneNode(true); ghost.className = "route-stop-card route-drag-ghost"; ghost.setAttribute("aria-hidden", "true"); document.body.appendChild(ghost);
+        const moveGhost = e => ghost.style.transform = `translate3d(${Math.max(8,e.clientX-ghost.offsetWidth/2)}px,${Math.max(8,e.clientY-28)}px,0)`;
+        moveGhost(event);
+        const move = e => {
+          if (e.pointerId !== pointerId) return; e.preventDefault(); moveGhost(e);
+          document.querySelectorAll("#routeStopList li.drop-target").forEach(item => item.classList.remove("drop-target"));
+          const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#routeStopList li");
+          if (target && target !== li) target.classList.add("drop-target");
+          const panel = $("routeSummary"), r = panel?.getBoundingClientRect();
+          if (panel && r) { if (e.clientY < r.top + 70) panel.scrollTop -= 9; else if (e.clientY > r.bottom - 90) panel.scrollTop += 9; }
+        };
+        const finish = e => {
+          if (e.pointerId !== pointerId) return;
+          const target = document.elementFromPoint(e.clientX, e.clientY)?.closest?.("#routeStopList li");
+          if (target && target !== li) { const box = target.getBoundingClientRect(); reorderRoute(dragId, target.dataset.routeId, e.clientY > box.top + box.height / 2); }
+          cleanup();
+        };
+        handle.addEventListener("pointermove", move);
+        handle.addEventListener("pointerup", finish, { once:true });
+        handle.addEventListener("pointercancel", cleanup, { once:true });
+      });
+    });
+  }
   function drawRoute() {
     const visibleIds = new Set(getVisibleLocations().map(location => location.id));
     const route = data.route.ids.map(byId).filter(Boolean).filter(location => visibleIds.has(location.id));
-    if (route.length !== data.route.ids.length) {
-      data.route.ids = route.map(location => location.id);
-      save();
-    }
+    if (route.length !== data.route.ids.length) { data.route.ids = route.map(location => location.id); save(); }
     const routeLayer = $("routeLayer");
     if (route.length < 2) routeLayer.innerHTML = "";
     else routeLayer.innerHTML = `<polyline class="route-line" points="${route.map(location => `${location.mapPosition.x * 10},${location.mapPosition.y * 10}`).join(" ")}"></polyline>`;
     if (!route.length) { $("routeSummary").hidden = true; $("routeSummary").innerHTML = ""; return; }
-    const distance = routeDistance(route);
-    const warnings = unique(route.flatMap(location => locationReadiness(location).missing));
+    const distance = routeDistance(route), warnings = unique(route.flatMap(location => locationReadiness(location).missing));
     $("routeSummary").hidden = false;
-    $("routeSummary").innerHTML = `<strong>${route.length} visible route stop${route.length === 1 ? "" : "s"}</strong><small> • ${distance.toFixed(1)} map units • estimated ${Math.max(5, Math.round(distance * 1.6))} min sailing effort</small>${warnings.length ? `<p>⚠ Upgrade warnings: ${esc(warnings.slice(0, 4).join(" • "))}</p>` : ""}<ol id="routeStopList">${route.map((location,index) => `<li draggable="true" data-route-id="${location.id}"><button class="route-drag-handle" aria-label="Drag to reorder ${esc(location.name)}">☰</button><button data-route-open="${location.id}">${esc(location.name)} <small>${esc(location.gameCoordinates)}</small></button><button data-route-remove="${location.id}" aria-label="Remove ${esc(location.name)}">✕</button></li>`).join("")}</ol><div class="route-actions"><button id="reverseRouteInline">Reverse</button><button id="clearRouteInline">Clear route</button></div>`;
+    $("routeSummary").innerHTML = `<header class="route-planner-header"><div><strong>${route.length} route stop${route.length === 1 ? "" : "s"}</strong><small>${distance.toFixed(1)} map units • about ${Math.max(5, Math.round(distance * 1.6))} min sailing</small></div><button id="closeRouteSummary" class="route-close" aria-label="Hide route planner">⌄</button></header>${warnings.length ? `<p class="route-warning">⚠ ${esc(warnings.slice(0, 4).join(" • "))}</p>` : ""}<ol id="routeStopList" class="route-stop-list">${route.map((location,index) => `<li class="route-stop-card" draggable="true" data-route-id="${location.id}"><span class="route-stop-number" aria-hidden="true">${index + 1}</span><button class="route-drag-handle" aria-label="Drag ${esc(location.name)} to reorder" title="Drag to reorder">☰</button><button class="route-stop-open" data-route-open="${location.id}"><b>${esc(location.name)}</b><small>${esc(location.gameCoordinates)}</small></button><button class="route-stop-remove" data-route-remove="${location.id}" aria-label="Remove ${esc(location.name)} from route">✕</button></li>`).join("")}</ol><div class="route-actions"><button id="reverseRouteInline">Reverse</button><button id="optimizeRouteInline">Optimize</button><button id="clearRouteInline" class="danger">Clear route</button></div>`;
     document.querySelectorAll("[data-route-open]").forEach(button => button.onclick = () => openLocation(button.dataset.routeOpen, true));
     document.querySelectorAll("[data-route-remove]").forEach(button => button.onclick = () => { data.route.ids=data.route.ids.filter(id=>id!==button.dataset.routeRemove); save(); drawRoute(); renderMarkers(); toast("Route stop removed"); });
-    let draggedRouteId=null; document.querySelectorAll("#routeStopList li").forEach(li=>{li.ondragstart=()=>{draggedRouteId=li.dataset.routeId;li.classList.add("dragging")};li.ondragend=()=>li.classList.remove("dragging");li.ondragover=e=>e.preventDefault();li.ondrop=e=>{e.preventDefault();const target=li.dataset.routeId;if(!draggedRouteId||target===draggedRouteId)return;const ids=[...data.route.ids],from=ids.indexOf(draggedRouteId),to=ids.indexOf(target);ids.splice(to,0,ids.splice(from,1)[0]);data.route.ids=ids;save();drawRoute();renderMarkers();toast("Route reordered")}});
-    $("reverseRouteInline").onclick = reverseRoute;
-    $("clearRouteInline").onclick = clearRoute;
+    bindRouteReordering();
+    $("reverseRouteInline").onclick = reverseRoute; $("optimizeRouteInline").onclick = optimizeCurrentRoute; $("clearRouteInline").onclick = clearRoute;
+    $("closeRouteSummary").onclick = () => { $("routeSummary").hidden = true; toast("Route planner hidden"); };
   }
-  function reverseRoute() { data.route.ids.reverse(); save(); drawRoute(); renderMarkers(); }
+  function reverseRoute() { data.route.ids.reverse(); save(); drawRoute(); renderMarkers(); toast("Route reversed"); }
   function clearRoute() { data.route.ids = []; save(); drawRoute(); renderMarkers(); toast("Route cleared"); }
   function renderRouteCandidateSummary() {
     const candidates = routeCandidates();

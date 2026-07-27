@@ -739,3 +739,44 @@ body.sheet-open .toast{bottom:max(calc(34dvh + 20px),calc(var(--ui-bottom) + 16p
 /* A marker detail sheet owns the lower interaction zone. Keep the inline route card
    out of the way until the marker sheet closes; the route itself remains preserved. */
 body.sheet-open #mapPanel .route-summary{display:none!important}
+
+
+/* v7.6.8 — completed iPhone-first route planner */
+#mapPanel .route-summary{display:flex;flex-direction:column;gap:10px;padding:14px!important}
+#mapPanel .route-summary .route-summary-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#mapPanel .route-summary .route-summary-header div{display:grid;gap:2px}
+#mapPanel .route-summary .route-summary-header strong{font-size:1rem}
+#mapPanel .route-summary .route-summary-header small{color:var(--muted);font-size:.74rem}
+#mapPanel .route-summary .route-warning{margin:0;padding:8px 10px;border:1px solid #5c4b28;border-radius:10px;background:#2a210e99;color:var(--gold2);font-size:.72rem}
+#mapPanel .route-summary #routeStopList{list-style:none;padding:0;margin:0;display:grid;gap:8px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#mapPanel .route-summary #routeStopList li{display:grid;grid-template-columns:34px minmax(0,1fr) 58px 62px;align-items:center;gap:6px;margin:0;padding:7px;border:1px solid #334c50;border-radius:14px;background:#0a181be8;transition:transform .16s ease,opacity .16s ease,box-shadow .16s ease}
+#mapPanel .route-summary #routeStopList li.dragging{opacity:.72;transform:scale(.985);box-shadow:0 12px 26px #000b,inset 0 0 0 1px var(--gold);z-index:2}
+#mapPanel .route-summary .route-stop-number{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--gold2);color:#071113;font-weight:800;font-size:.82rem}
+#mapPanel .route-summary #routeStopList li button{width:auto;min-width:0;margin:0;padding:7px;min-height:48px;text-align:center}
+#mapPanel .route-summary .route-stop-main{display:grid;gap:3px;text-align:left!important;background:transparent;border-color:transparent}
+#mapPanel .route-summary .route-stop-main strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem}
+#mapPanel .route-summary .route-stop-main small{color:var(--muted);font-size:.68rem}
+#mapPanel .route-summary .route-drag-handle,#mapPanel .route-summary .route-remove-button{display:grid;place-items:center;gap:0;font-size:1rem;touch-action:none;user-select:none;-webkit-user-select:none}
+#mapPanel .route-summary .route-drag-handle small,#mapPanel .route-summary .route-remove-button small{font-size:.56rem;color:var(--muted)}
+#mapPanel .route-summary .route-remove-button{color:#ffc6bd}
+#mapPanel .route-summary .route-actions{grid-template-columns:repeat(3,minmax(0,1fr));margin:2px -14px -14px!important;padding:12px 14px!important}
+#mapPanel .route-summary .route-actions button{font-size:.75rem;padding:8px 5px}
+#mapPanel .route-summary .route-actions button.danger{border-color:#71443f;color:#ffd1ca}
+body.route-reordering{user-select:none;-webkit-user-select:none}
+body.route-reordering #mapPanel .route-summary{overscroll-behavior:none}
+@media(max-width:390px){#mapPanel .route-summary #routeStopList li{grid-template-columns:30px minmax(0,1fr) 52px 56px;gap:4px;padding:6px}#mapPanel .route-summary .route-actions{gap:6px}}
+
+/* v7.6.8 — Phase 1 Route Planner Completion */
+#mapPanel .route-summary{padding:0!important;overflow:hidden!important;display:flex;flex-direction:column}
+.route-planner-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px 10px;border-bottom:1px solid #2d4346;flex:0 0 auto}
+.route-planner-header>div{display:grid;gap:3px;min-width:0}.route-planner-header strong{font-size:1rem}.route-planner-header small{color:var(--muted);font-size:.7rem;white-space:normal}.route-close{width:44px;min-width:44px;height:44px;padding:0;margin:0!important;text-align:center!important;font-size:1.1rem}
+.route-warning{margin:0;padding:9px 14px;color:var(--gold2);font-size:.7rem;border-bottom:1px solid #273b3e}
+.route-stop-list{list-style:none;margin:0!important;padding:10px 12px!important;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:grid;gap:8px;min-height:0}
+.route-stop-card{position:relative;display:grid;grid-template-columns:32px 44px minmax(0,1fr) 44px;align-items:center;gap:5px;margin:0!important;padding:6px;border:1px solid #334d51;border-radius:13px;background:#0a1719;transition:transform .15s,border-color .15s,opacity .15s}
+.route-stop-card button{width:auto!important;min-height:44px!important;margin:0!important}.route-stop-number{display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:var(--gold2);color:#071113;font-weight:900;font-size:.78rem}
+.route-drag-handle{display:grid;place-items:center;padding:0!important;text-align:center!important;cursor:grab;touch-action:none;font-size:1.05rem;color:var(--gold2)}
+.route-stop-open{display:grid;gap:3px;padding:7px 9px!important;text-align:left!important;overflow:hidden}.route-stop-open b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.route-stop-open small{color:var(--muted);font-size:.67rem}.route-stop-remove{padding:0!important;text-align:center!important;color:#efaaa5;border-color:#704846!important}
+.route-stop-card.dragging{opacity:.42;transform:scale(.985)}.route-stop-card.drop-target{border-color:var(--gold2);box-shadow:inset 0 0 0 1px var(--gold2)}
+.route-drag-ghost{position:fixed!important;z-index:500!important;left:0;top:0;width:min(88vw,510px);pointer-events:none;opacity:.94;box-shadow:0 16px 38px #000d;transform:translate3d(-200vw,-200vh,0);transition:none!important}body.route-reordering{user-select:none;-webkit-user-select:none;overflow:hidden}
+#mapPanel .route-summary .route-actions{grid-template-columns:repeat(3,minmax(0,1fr));margin:0!important;padding:10px 12px calc(10px + var(--safe-bottom))!important;bottom:0!important;flex:0 0 auto}#mapPanel .route-summary .route-actions button{padding:9px 6px!important;font-size:.72rem}
+@media(max-width:380px){.route-stop-card{grid-template-columns:28px 42px minmax(0,1fr) 42px;gap:3px}.route-stop-number{width:27px;height:27px}.route-stop-open{padding-inline:6px!important}#mapPanel .route-summary .route-actions{grid-template-columns:1fr 1fr}.route-actions .danger{grid-column:1/-1}}.reduce-motion .route-stop-card{transition:none}

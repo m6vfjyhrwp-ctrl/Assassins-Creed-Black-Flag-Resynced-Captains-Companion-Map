@@ -214,3 +214,7 @@
 - Added safe-area-aware sizing, internal scrolling, focus containment, keyboard handling, and small-screen adaptations.
 - Expanded onboarding into a four-step introduction covering the app purpose, map gestures, planning tools, local storage, backups, offline use, and replay access.
 - Preserved Developer Console v1, all 104 records, marker IDs, routes, progress, calibration, database version 9, user-data schema 3, and storage-key compatibility.
+
+## 7.6.8
+- Completed the route-stop card interface and iPhone-compatible manual reordering.
+- Added Optimize Route and cleaned up route actions.
