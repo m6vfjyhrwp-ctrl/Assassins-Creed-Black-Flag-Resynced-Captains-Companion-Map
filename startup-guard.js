@@ -47,9 +47,11 @@
     const sheet = stylesheet();
     if (!sheet) return false;
     try {
-      const index = sheet.cssRules.length;
-      sheet.insertRule(`${selector}{${body}}`, index);
-      dynamicRules.set(id, index);
+      for (let index = sheet.cssRules.length - 1; index >= 0; index -= 1) {
+        if (sheet.cssRules[index]?.selectorText === selector) sheet.deleteRule(index);
+      }
+      sheet.insertRule(`${selector}{${body}}`, sheet.cssRules.length);
+      dynamicRules.set(id, true);
       return true;
     } catch (error) {
       record("dynamic-style", error.message || error);

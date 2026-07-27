@@ -1,5 +1,66 @@
 # Changelog
 
+## 7.6.3 — Constrained POI Dropdown Repair
+
+- Constrained the POI dropdown to the Caribbean bubble width.
+- Anchored it directly beneath the bubble with compact internal scrolling.
+- Simplified actions to Edit Filters and Clear Filters.
+- Updated accessibility and production cache identity.
+
+## 7.6.2 — Expandable POI Summary Dropdown
+- Added expandable map-context summary for active POI categories and filters.
+- Added quick actions and accessible dismissal behavior.
+- Preserved map calibration, data schema, and Navigation First layout.
+
+# Animus Companion Changelog
+
+## 7.6.1 — Extended World Canvas and Playable Boundary (Production)
+
+- Promoted the approved persistent, safe-area-aware navigation layout to production.
+- Preserved the complete map, database, user-data schema, routes, progress, and offline systems.
+- Resolved the inline-style CSP regression by moving runtime viewport variables into the trusted stylesheet.
+- Added required repository verification files and regenerated release integrity metadata.
+
+## 7.6.1 — Universal Safe Interaction Layout
+- Unified top, side, and bottom safe interaction zones.
+- Reduced header and dock footprint while preserving 44-point touch targets.
+- Repositioned floating controls and sheets to avoid the dock and screen edges.
+- Added Developer Layout Overlay and explicit Feedback Capture export.
+- Added visual-viewport synchronization for iPhone rotation and Display Zoom.
+
+## 7.6.1 — Persistent Full-Screen Navigation Test
+
+- Keeps the floating bottom navigation dock visible in full-screen map mode.
+- Preserves iPhone safe-area spacing above the Home indicator.
+- Replaces the large map card treatment with a compact map-information pill and separate floating actions.
+- Raises drawers, sheets, menus, and toasts above the persistent navigation.
+- Preserves the test.2 two-axis panning and camera behavior.
+
+# Changelog
+
+## 7.6.3 — Constrained POI Dropdown Repair
+
+- Constrained the POI dropdown to the Caribbean bubble width.
+- Anchored it directly beneath the bubble with compact internal scrolling.
+- Simplified actions to Edit Filters and Clear Filters.
+- Updated accessibility and production cache identity.
+
+## 7.6.1 — Two-Axis Pan Reachability Hotfix
+
+- Added guaranteed vertical map travel at minimum zoom.
+- Introduced modest vertical overscan so locations can be moved above or below floating controls without exposing empty space.
+- Preserved full-screen safe-area layout, horizontal panning, pinch zoom, markers, routes, saves, and existing test architecture.
+
+
+## 7.6.1 — Immersive Full-Screen Map Test
+
+- Converted the map screen to a true full-viewport layer.
+- Extended map rendering behind the iPhone status and Home-indicator areas.
+- Floated the header, toolbar, map controls, status pill, tab bar, and detail sheet over the map.
+- Preserved source aspect ratio using cover-style camera framing rather than image distortion.
+- Retained bounded horizontal and vertical panning, anchored pinch zoom, routes, markers, filters, and local saves.
+- Marked this package as an isolated test release for a separate GitHub Pages repository.
+
 ## 7.4.1 — Jackdaw Accuracy and Full-Map Navigation
 
 - Corrected Jackdaw upgrade limits for broadside cannons, heavy shot, chain shot/bow chaser, mortars, swivels, fire barrels, ram, crew quarters, harpoon strength, and diving bell.
@@ -23,6 +84,13 @@
 - Preserved all existing data, routes, filters, progress, backup compatibility, and map coordinates.
 
 # Changelog
+
+## 7.6.3 — Constrained POI Dropdown Repair
+
+- Constrained the POI dropdown to the Caribbean bubble width.
+- Anchored it directly beneath the bubble with compact internal scrolling.
+- Simplified actions to Edit Filters and Clear Filters.
+- Updated accessibility and production cache identity.
 
 ## 7.3.5 — Map Framing & Coordinate Integrity
 
@@ -49,6 +117,13 @@
 
 # Changelog
 
+## 7.6.3 — Constrained POI Dropdown Repair
+
+- Constrained the POI dropdown to the Caribbean bubble width.
+- Anchored it directly beneath the bubble with compact internal scrolling.
+- Simplified actions to Edit Filters and Clear Filters.
+- Updated accessibility and production cache identity.
+
 ## 7.3.4 — Encyclopedia Removal & Regression Guard (2026-07-26)
 
 - Removed the incomplete Encyclopedia tab, renderer, search controls, bookmark state, and all startup render references.
@@ -73,6 +148,13 @@
 - Preserved database version 9, schema 3, onboarding, and saved-data compatibility.
 
 # Changelog
+
+## 7.6.3 — Constrained POI Dropdown Repair
+
+- Constrained the POI dropdown to the Caribbean bubble width.
+- Anchored it directly beneath the bubble with compact internal scrolling.
+- Simplified actions to Edit Filters and Clear Filters.
+- Updated accessibility and production cache identity.
 
 ## 7.2.2 — Startup escape hardening
 - Moved the startup guard into the document head so it starts before application modules.

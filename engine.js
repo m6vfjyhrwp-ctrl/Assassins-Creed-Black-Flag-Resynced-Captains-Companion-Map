@@ -1,242 +1,36 @@
 "use strict";
-/** Animus Map Engine 4.1 — full-map fit, two-axis bounded pan, and anchored pinch zoom. */
+/** Animus Map Engine 7.6.1 — extended world canvas with preserved playable-map calibration. */
 (() => {
-  const viewport = document.getElementById("viewport");
-  const stage = document.getElementById("stage");
-  const image = stage?.querySelector(".map-image");
-  if (!viewport || !stage) return;
-
-  const MAP_ASPECT = 1944 / 1665;
-  const state = {
-    x: 0, y: 0, scale: 1, min: 1, max: 6,
-    baseWidth: 0, baseHeight: 0,
-    pointers: new Map(), velocityX: 0, velocityY: 0,
-    inertiaRaf: 0, renderRaf: 0, changedTimer: 0,
-    lastCentroid: null, lastDistance: 0, gestureWasPinch: false
-  };
-
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  const pointerList = () => [...state.pointers.values()];
-  const setDynamicStyle = (element, declarations) => window.ANIMUS_SET_DYNAMIC_STYLE?.(element, declarations);
-
-  function measure(preserveCenter = true) {
-    const vw = Math.max(1, viewport.clientWidth);
-    const vh = Math.max(1, viewport.clientHeight);
-    const oldWidth = state.baseWidth || vw;
-    const oldHeight = state.baseHeight || vh;
-    const oldCenterX = ((vw / 2 - state.x) / state.scale) / oldWidth;
-    const oldCenterY = ((vh / 2 - state.y) / state.scale) / oldHeight;
-
-    // Fit the complete source map inside the viewport without distortion.
-    // Zooming then expands from this full-map overview, enabling useful pan on both axes.
-    if (vw / vh > MAP_ASPECT) {
-      state.baseHeight = vh;
-      state.baseWidth = vh * MAP_ASPECT;
-    } else {
-      state.baseWidth = vw;
-      state.baseHeight = vw / MAP_ASPECT;
-    }
-    setDynamicStyle(stage, { width: `${state.baseWidth}px`, height: `${state.baseHeight}px` });
-
-    if (preserveCenter && Number.isFinite(oldCenterX) && Number.isFinite(oldCenterY)) {
-      state.x = vw / 2 - oldCenterX * state.baseWidth * state.scale;
-      state.y = vh / 2 - oldCenterY * state.baseHeight * state.scale;
-    }
-  }
-
-  function bounds() {
-    const vw = viewport.clientWidth;
-    const vh = viewport.clientHeight;
-    const renderedWidth = state.baseWidth * state.scale;
-    const renderedHeight = state.baseHeight * state.scale;
-    const centeredX = (vw - renderedWidth) / 2;
-    const centeredY = (vh - renderedHeight) / 2;
-    // A small navigation margin keeps two-axis panning available even at the overview scale.
-    // The map remains bounded so it cannot be lost off-screen.
-    const panMarginX = Math.min(vw * 0.08, 42);
-    const panMarginY = Math.min(vh * 0.08, 42);
-    return {
-      minX: renderedWidth <= vw ? centeredX - panMarginX : vw - renderedWidth,
-      maxX: renderedWidth <= vw ? centeredX + panMarginX : 0,
-      minY: renderedHeight <= vh ? centeredY - panMarginY : vh - renderedHeight,
-      maxY: renderedHeight <= vh ? centeredY + panMarginY : 0
-    };
-  }
-
-  function constrain() {
-    const b = bounds();
-    state.x = clamp(state.x, b.minX, b.maxX);
-    state.y = clamp(state.y, b.minY, b.maxY);
-  }
-
-  function notifyChange() {
-    clearTimeout(state.changedTimer);
-    state.changedTimer = setTimeout(() => window.dispatchEvent(new CustomEvent("acbf:map-change")), 90);
-  }
-
-  function draw(notify = true) {
-    if (!state.baseWidth || !state.baseHeight) measure(false);
-    constrain();
-    setDynamicStyle(stage, {
-      transform: `translate3d(${state.x}px,${state.y}px,0) scale(${state.scale})`,
-      "--marker-scale": String(1 / Math.sqrt(state.scale))
-    });
-    if (notify) notifyChange();
-  }
-
-  function scheduleDraw(notify = false) {
-    if (state.renderRaf) return;
-    state.renderRaf = requestAnimationFrame(() => { state.renderRaf = 0; draw(notify); });
-  }
-
-  function stopInertia() {
-    if (state.inertiaRaf) cancelAnimationFrame(state.inertiaRaf);
-    state.inertiaRaf = 0;
-  }
-
-  function centroid(points = pointerList()) {
-    if (!points.length) return null;
-    const total = points.reduce((sum, p) => ({ x: sum.x + p.x, y: sum.y + p.y }), { x: 0, y: 0 });
-    return { x: total.x / points.length, y: total.y / points.length };
-  }
-
-  function distance(points = pointerList()) {
-    if (points.length < 2) return 0;
-    return Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
-  }
-
-  function zoomAt(nextScale, clientX, clientY, notify = true) {
-    const rect = viewport.getBoundingClientRect();
-    const px = clientX - rect.left;
-    const py = clientY - rect.top;
-    const oldScale = state.scale;
-    nextScale = clamp(nextScale, state.min, state.max);
-    if (Math.abs(nextScale - oldScale) < 0.0005) return;
-    const worldX = (px - state.x) / oldScale;
-    const worldY = (py - state.y) / oldScale;
-    state.scale = nextScale;
-    state.x = px - worldX * nextScale;
-    state.y = py - worldY * nextScale;
-    if (notify) draw(); else scheduleDraw(false);
-  }
-
-  function focusPercent(xPercent, yPercent, nextScale = 2.5, targetX = viewport.clientWidth / 2, targetY = viewport.clientHeight / 2) {
-    stopInertia();
-    state.scale = clamp(nextScale, state.min, state.max);
-    state.x = targetX - state.baseWidth * clamp(xPercent, 0, 100) / 100 * state.scale;
-    state.y = targetY - state.baseHeight * clamp(yPercent, 0, 100) / 100 * state.scale;
-    draw();
-  }
-
-  function centerPercent() {
-    return {
-      x: clamp(((viewport.clientWidth / 2 - state.x) / state.scale) / state.baseWidth * 100, 0, 100),
-      y: clamp(((viewport.clientHeight / 2 - state.y) / state.scale) / state.baseHeight * 100, 0, 100)
-    };
-  }
-
-  function reset() {
-    stopInertia();
-    state.scale = 1;
-    state.velocityX = 0;
-    state.velocityY = 0;
-    measure(false);
-    const b = bounds();
-    state.x = (b.minX + b.maxX) / 2;
-    state.y = (b.minY + b.maxY) / 2;
-    draw();
-    window.dispatchEvent(new CustomEvent("acbf:map-reset"));
-  }
-
-  function startGesture() {
-    const points = pointerList();
-    state.lastCentroid = centroid(points);
-    state.lastDistance = distance(points);
-    state.gestureWasPinch = points.length > 1;
-    if (state.gestureWasPinch) {
-      state.velocityX = 0; state.velocityY = 0;
-      viewport.classList.add("is-pinching");
-    } else viewport.classList.add("is-panning");
-  }
-
-  function inertia() {
-    stopInertia();
-    if (state.gestureWasPinch || Math.hypot(state.velocityX, state.velocityY) < 0.2) { notifyChange(); return; }
-    let last = performance.now();
-    const tick = now => {
-      const dt = Math.min(32, now - last) / 16.67; last = now;
-      state.x += state.velocityX * dt; state.y += state.velocityY * dt;
-      state.velocityX *= Math.pow(0.89, dt); state.velocityY *= Math.pow(0.89, dt);
-      draw(false);
-      if (Math.hypot(state.velocityX, state.velocityY) > 0.16) state.inertiaRaf = requestAnimationFrame(tick);
-      else { state.inertiaRaf = 0; notifyChange(); }
-    };
-    state.inertiaRaf = requestAnimationFrame(tick);
-  }
-
-  viewport.addEventListener("pointerdown", event => {
-    if (event.target.closest("button")) return;
-    event.preventDefault(); stopInertia(); viewport.setPointerCapture?.(event.pointerId);
-    state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, t: performance.now() }); startGesture();
-  }, { passive: false });
-
-  viewport.addEventListener("pointermove", event => {
-    const previousPointer = state.pointers.get(event.pointerId); if (!previousPointer) return;
-    event.preventDefault(); const now = performance.now();
-    state.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, t: now });
-    const points = pointerList(); const nextCentroid = centroid(points);
-    if (!nextCentroid || !state.lastCentroid) { startGesture(); return; }
-    if (points.length === 1) {
-      const dx = nextCentroid.x - state.lastCentroid.x; const dy = nextCentroid.y - state.lastCentroid.y;
-      const dt = Math.max(8, now - previousPointer.t);
-      state.x += dx; state.y += dy; state.velocityX = dx * 16.67 / dt; state.velocityY = dy * 16.67 / dt;
-      state.lastCentroid = nextCentroid; scheduleDraw(false); return;
-    }
-    state.gestureWasPinch = true; viewport.classList.remove("is-panning"); viewport.classList.add("is-pinching");
-    const nextDistance = distance(points); const rect = viewport.getBoundingClientRect();
-    const oldCenterX = state.lastCentroid.x - rect.left; const oldCenterY = state.lastCentroid.y - rect.top;
-    const newCenterX = nextCentroid.x - rect.left; const newCenterY = nextCentroid.y - rect.top;
-    const oldScale = state.scale; const ratio = state.lastDistance > 0 ? nextDistance / state.lastDistance : 1;
-    const nextScale = clamp(oldScale * ratio, state.min, state.max);
-    const worldX = (oldCenterX - state.x) / oldScale; const worldY = (oldCenterY - state.y) / oldScale;
-    state.scale = nextScale; state.x = newCenterX - worldX * nextScale; state.y = newCenterY - worldY * nextScale;
-    state.lastCentroid = nextCentroid; state.lastDistance = nextDistance; state.velocityX = 0; state.velocityY = 0;
-    scheduleDraw(false);
-  }, { passive: false });
-
-  function endPointer(event) {
-    if (!state.pointers.has(event.pointerId)) return;
-    state.pointers.delete(event.pointerId); try { viewport.releasePointerCapture?.(event.pointerId); } catch (_) {}
-    viewport.classList.remove("is-pinching", "is-panning");
-    if (!state.pointers.size) { state.lastCentroid = null; state.lastDistance = 0; draw(false); inertia(); return; }
-    startGesture();
-  }
-  viewport.addEventListener("pointerup", endPointer);
-  viewport.addEventListener("pointercancel", endPointer);
-  viewport.addEventListener("lostpointercapture", endPointer);
-  viewport.addEventListener("dblclick", event => { event.preventDefault(); zoomAt(state.scale < 2.5 ? state.scale * 1.65 : 1, event.clientX, event.clientY); });
-  viewport.addEventListener("wheel", event => { event.preventDefault(); zoomAt(state.scale * Math.exp(-event.deltaY * 0.0015), event.clientX, event.clientY); }, { passive: false });
-  document.getElementById("zoomIn")?.addEventListener("click", () => { const r = viewport.getBoundingClientRect(); zoomAt(state.scale * 1.35, r.left + r.width / 2, r.top + r.height / 2); });
-  document.getElementById("zoomOut")?.addEventListener("click", () => { const r = viewport.getBoundingClientRect(); zoomAt(state.scale / 1.35, r.left + r.width / 2, r.top + r.height / 2); });
-  document.getElementById("reset")?.addEventListener("click", reset);
-  window.addEventListener("resize", () => { measure(true); draw(false); }, { passive: true });
-  window.addEventListener("orientationchange", () => setTimeout(() => { measure(true); draw(false); }, 120), { passive: true });
-  image?.addEventListener("load", () => { measure(true); draw(false); }, { once: true });
-
-  window.ACBF_MAP = {
-    reset,
-    getState: () => ({ x: state.x, y: state.y, scale: state.scale }),
-    getGeometry: () => ({ width: state.baseWidth, height: state.baseHeight, aspect: MAP_ASPECT, bounds: bounds() }),
-    getCenterPercent: centerPercent,
-    zoomTo: zoomAt,
-    focusPercent,
-    setState: next => {
-      if (!next || !Number.isFinite(next.scale)) return;
-      stopInertia(); measure(false);
-      state.scale = clamp(next.scale, state.min, state.max); state.x = Number(next.x) || 0; state.y = Number(next.y) || 0; draw();
-    }
-  };
-
-  measure(false);
-  reset();
+  const viewport=document.getElementById("viewport"),stage=document.getElementById("stage"),image=stage?.querySelector(".map-image");
+  if(!viewport||!stage)return;
+  const PLAYABLE_W=1944,PLAYABLE_H=1665,CANVAS_W=2664,CANVAS_H=2265;
+  const CANVAS_ASPECT=CANVAS_W/CANVAS_H, OFFSET_X=360/CANVAS_W, OFFSET_Y=300/CANVAS_H, PLAYABLE_RATIO_X=PLAYABLE_W/CANVAS_W, PLAYABLE_RATIO_Y=PLAYABLE_H/CANVAS_H;
+  const state={x:0,y:0,scale:1,min:1,max:6,baseWidth:0,baseHeight:0,pointers:new Map(),velocityX:0,velocityY:0,inertiaRaf:0,renderRaf:0,changedTimer:0,lastCentroid:null,lastDistance:0,gestureWasPinch:false};
+  const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+  const setDynamicStyle=(el,d)=>window.ANIMUS_SET_DYNAMIC_STYLE?.(el,d);
+  const pointerList=()=>[...state.pointers.values()];
+  function measure(preserve=true){const vw=Math.max(1,viewport.clientWidth),vh=Math.max(1,viewport.clientHeight),ow=state.baseWidth||vw,oh=state.baseHeight||vh,cx=((vw/2-state.x)/state.scale)/ow,cy=((vh/2-state.y)/state.scale)/oh; if(vw/vh>CANVAS_ASPECT){state.baseWidth=vw;state.baseHeight=vw/CANVAS_ASPECT}else{state.baseHeight=vh;state.baseWidth=vh*CANVAS_ASPECT} setDynamicStyle(stage,{width:`${state.baseWidth}px`,height:`${state.baseHeight}px`}); if(preserve&&Number.isFinite(cx)&&Number.isFinite(cy)){state.x=vw/2-cx*state.baseWidth*state.scale;state.y=vh/2-cy*state.baseHeight*state.scale}}
+  function bounds(){const vw=viewport.clientWidth,vh=viewport.clientHeight,rw=state.baseWidth*state.scale,rh=state.baseHeight*state.scale,overscanX=Math.min(vw*.42,state.baseWidth*.12*state.scale),overscanY=Math.min(vh*.42,state.baseHeight*.12*state.scale);return{minX:vw-rw-overscanX,maxX:overscanX,minY:vh-rh-overscanY,maxY:overscanY}}
+  function constrain(){const b=bounds();state.x=clamp(state.x,b.minX,b.maxX);state.y=clamp(state.y,b.minY,b.maxY)}
+  function notify(){clearTimeout(state.changedTimer);state.changedTimer=setTimeout(()=>window.dispatchEvent(new CustomEvent("acbf:map-change")),90)}
+  function draw(n=true){if(!state.baseWidth)measure(false);constrain();setDynamicStyle(stage,{width:`${state.baseWidth}px`,height:`${state.baseHeight}px`,transform:`translate3d(${state.x}px,${state.y}px,0) scale(${state.scale})`,"--marker-scale":String(1/Math.sqrt(state.scale))});if(n)notify()}
+  function schedule(){if(state.renderRaf)return;state.renderRaf=requestAnimationFrame(()=>{state.renderRaf=0;draw(false)})}
+  function stop(){if(state.inertiaRaf)cancelAnimationFrame(state.inertiaRaf);state.inertiaRaf=0}
+  function centroid(ps=pointerList()){if(!ps.length)return null;return{x:ps.reduce((a,p)=>a+p.x,0)/ps.length,y:ps.reduce((a,p)=>a+p.y,0)/ps.length}}
+  function distance(ps=pointerList()){return ps.length<2?0:Math.hypot(ps[0].x-ps[1].x,ps[0].y-ps[1].y)}
+  function zoomAt(ns,cx,cy,n=true){const r=viewport.getBoundingClientRect(),px=cx-r.left,py=cy-r.top,os=state.scale;ns=clamp(ns,state.min,state.max);if(Math.abs(ns-os)<.0005)return;const wx=(px-state.x)/os,wy=(py-state.y)/os;state.scale=ns;state.x=px-wx*ns;state.y=py-wy*ns;n?draw():schedule()}
+  function playableToCanvas(x,y){return{x:(OFFSET_X+clamp(x,0,100)/100*PLAYABLE_RATIO_X)*state.baseWidth,y:(OFFSET_Y+clamp(y,0,100)/100*PLAYABLE_RATIO_Y)*state.baseHeight}}
+  function focusPercent(x,y,ns=2.5,tx=viewport.clientWidth/2,ty=viewport.clientHeight/2){stop();state.scale=clamp(ns,state.min,state.max);const p=playableToCanvas(x,y);state.x=tx-p.x*state.scale;state.y=ty-p.y*state.scale;draw()}
+  function getSafeFocusRect(){const topbar=document.querySelector('#mapPanel .map-topbar')?.getBoundingClientRect(),dock=document.querySelector('.tab-bar')?.getBoundingClientRect(),controls=document.querySelector('#mapPanel .map-controls')?.getBoundingClientRect(),vr=viewport.getBoundingClientRect();return{left:24,top:Math.max(24,(topbar?.bottom||vr.top)-vr.top+18),right:Math.max(24,vr.right-(controls?.left||vr.right)+18),bottom:Math.max(24,vr.bottom-(dock?.top||vr.bottom)+18)}}
+  function focusPercentSafe(x,y,ns=2.5){const s=getSafeFocusRect(),w=viewport.clientWidth-s.left-s.right,h=viewport.clientHeight-s.top-s.bottom;focusPercent(x,y,ns,s.left+w/2,s.top+h*.44)}
+  function reset(){stop();state.scale=1;measure(false);const pcx=(OFFSET_X+PLAYABLE_RATIO_X/2)*state.baseWidth,pcy=(OFFSET_Y+PLAYABLE_RATIO_Y/2)*state.baseHeight;state.x=viewport.clientWidth/2-pcx;state.y=viewport.clientHeight/2-pcy;draw();window.dispatchEvent(new CustomEvent("acbf:map-reset"))}
+  function startGesture(){const ps=pointerList();state.lastCentroid=centroid(ps);state.lastDistance=distance(ps);state.gestureWasPinch=ps.length>1;viewport.classList.toggle('is-pinching',state.gestureWasPinch);viewport.classList.toggle('is-panning',!state.gestureWasPinch)}
+  function inertia(){stop();if(state.gestureWasPinch||Math.hypot(state.velocityX,state.velocityY)<.2){notify();return}let last=performance.now();const tick=now=>{const dt=Math.min(32,now-last)/16.67;last=now;state.x+=state.velocityX*dt;state.y+=state.velocityY*dt;state.velocityX*=Math.pow(.89,dt);state.velocityY*=Math.pow(.89,dt);draw(false);if(Math.hypot(state.velocityX,state.velocityY)>.16)state.inertiaRaf=requestAnimationFrame(tick);else notify()};state.inertiaRaf=requestAnimationFrame(tick)}
+  viewport.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;e.preventDefault();stop();viewport.setPointerCapture?.(e.pointerId);state.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now()});startGesture()},{passive:false});
+  viewport.addEventListener('pointermove',e=>{const prev=state.pointers.get(e.pointerId);if(!prev)return;e.preventDefault();const now=performance.now();state.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,t:now});const ps=pointerList(),nc=centroid(ps);if(!nc||!state.lastCentroid){startGesture();return}if(ps.length===1){const dx=nc.x-state.lastCentroid.x,dy=nc.y-state.lastCentroid.y,dt=Math.max(8,now-prev.t);state.x+=dx;state.y+=dy;state.velocityX=dx*16.67/dt;state.velocityY=dy*16.67/dt;state.lastCentroid=nc;schedule();return}state.gestureWasPinch=true;const nd=distance(ps),r=viewport.getBoundingClientRect(),ocx=state.lastCentroid.x-r.left,ocy=state.lastCentroid.y-r.top,ncx=nc.x-r.left,ncy=nc.y-r.top,os=state.scale,ratio=state.lastDistance?nd/state.lastDistance:1,ns=clamp(os*ratio,state.min,state.max),wx=(ocx-state.x)/os,wy=(ocy-state.y)/os;state.scale=ns;state.x=ncx-wx*ns;state.y=ncy-wy*ns;state.lastCentroid=nc;state.lastDistance=nd;state.velocityX=state.velocityY=0;schedule()},{passive:false});
+  function end(e){if(!state.pointers.has(e.pointerId))return;state.pointers.delete(e.pointerId);try{viewport.releasePointerCapture?.(e.pointerId)}catch{}viewport.classList.remove('is-pinching','is-panning');if(!state.pointers.size){state.lastCentroid=null;state.lastDistance=0;draw(false);inertia()}else startGesture()}
+  ['pointerup','pointercancel','lostpointercapture'].forEach(t=>viewport.addEventListener(t,end));viewport.addEventListener('dblclick',e=>{e.preventDefault();zoomAt(state.scale<2.5?state.scale*1.65:1,e.clientX,e.clientY)});viewport.addEventListener('wheel',e=>{e.preventDefault();zoomAt(state.scale*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
+  document.getElementById('zoomIn')?.addEventListener('click',()=>{const r=viewport.getBoundingClientRect();zoomAt(state.scale*1.35,r.left+r.width/2,r.top+r.height/2)});document.getElementById('zoomOut')?.addEventListener('click',()=>{const r=viewport.getBoundingClientRect();zoomAt(state.scale/1.35,r.left+r.width/2,r.top+r.height/2)});document.getElementById('reset')?.addEventListener('click',reset);window.addEventListener('resize',()=>{measure(true);draw(false)},{passive:true});image?.addEventListener('load',()=>{measure(true);draw(false)},{once:true});
+  window.ACBF_MAP={reset,getState:()=>({x:state.x,y:state.y,scale:state.scale,canvasVersion:1}),getGeometry:()=>({width:state.baseWidth,height:state.baseHeight,aspect:PLAYABLE_W/PLAYABLE_H,canvasAspect:CANVAS_ASPECT,bounds:bounds(),canvas:{width:CANVAS_W,height:CANVAS_H},playable:{x:360,y:300,width:PLAYABLE_W,height:PLAYABLE_H}}),getSafeFocusRect,zoomTo:zoomAt,focusPercent,focusPercentSafe,setState:n=>{if(!n||!Number.isFinite(n.scale))return;stop();measure(false);state.scale=clamp(n.scale,state.min,state.max);if(n.canvasVersion===1){state.x=Number(n.x)||0;state.y=Number(n.y)||0}else{reset();return}draw()}};
+  measure(false);reset();
 })();

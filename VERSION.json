@@ -1,12 +1,12 @@
 {
-  "version": "7.4.1",
-  "name": "Map Framing & Coordinate Integrity",
+  "version": "7.6.3",
+  "name": "Constrained POI Dropdown Repair",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
-  "released": "2026-07-26",
-  "buildId": "animus-v7.4.1-20260726",
+  "released": "2026-07-27",
+  "buildId": "animus-v7.6.3-constrained-poi-dropdown-20260727",
   "releaseChannel": "production",
   "integrityManifestVersion": 2,
-  "buildDate": "2026-07-26"
+  "buildDate": "2026-07-27"
 }

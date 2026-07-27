@@ -1,13 +1,13 @@
 {
-  "name": "Animus Companion 7.0.0 \u2014 Public Release",
-  "short_name": "Animus Captain",
-  "description": "Unofficial fan-made offline Black Flag companion with an interactive map, progress, routes, notes, backups, and release-integrity verification.",
+  "name": "Animus Companion 7.6.3 Constrained POI Dropdown Repair",
+  "short_name": "Animus 7.6.3",
+  "description": "Production map interface with an accessible expandable summary of applied POI categories and filters.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#030708",
   "theme_color": "#050a0b",
-  "id": "./?pwa=1",
+  "id": "./?pwa=v762",
   "categories": [
     "games",
     "utilities"

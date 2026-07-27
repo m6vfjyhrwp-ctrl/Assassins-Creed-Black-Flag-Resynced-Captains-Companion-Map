@@ -10,14 +10,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; worker-src 'self'; manifest-src 'self'; media-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests">
   <meta name="apple-mobile-web-app-title" content="Animus Companion">
-  <script src="./startup-guard.js?v=7.4.1"></script>
-  <title>Animus Companion 7.4.1 — Apple Maps Experience</title>
-  <link rel="manifest" href="./manifest.webmanifest?v=7.4.1">
+  <script src="./startup-guard.js?v=7.6.3"></script>
+  <title>Animus Companion 7.6.3 — Constrained POI Dropdown Repair</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=7.6.3">
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
   <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png">
-  <link rel="stylesheet" href="./styles.css?v=7.4.1">
+  <link rel="stylesheet" href="./styles.css?v=7.6.3">
 </head>
 <body>
   <div id="bootScreen" class="boot-screen" aria-label="Loading Animus Companion">
@@ -32,7 +32,7 @@
     </button>
     <div class="header-actions">
       <button id="globalSearchButton" class="icon-button" type="button" aria-label="Search">⌕</button>
-      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.4.1 <small id="releaseStatusText">Integrity Not Verified</small></button>
+      <button id="versionButton" class="version-button release-status-unverified" type="button" aria-label="Release information">v7.6.3 <small id="releaseStatusText">Integrity Not Verified</small></button>
     </div>
   </header>
 
@@ -49,7 +49,23 @@
       <div class="map-shell">
         <section id="mapColumn" class="map-column panel">
           <div class="map-topbar">
-            <div class="map-context"><b id="mapTitle">Caribbean Map</b><small id="mapContext">All visible locations</small></div>
+            <div class="poi-summary-control">
+              <button id="poiSummaryButton" class="map-context" type="button" aria-expanded="false" aria-controls="poiSummaryDropdown">
+                <span class="map-context-copy"><b id="mapTitle">Caribbean Map</b><small id="mapContext">All visible locations</small></span>
+                <span class="poi-summary-chevron" aria-hidden="true">⌄</span>
+              </button>
+              <section id="poiSummaryDropdown" class="poi-summary-dropdown" hidden aria-label="Applied map points of interest and filters">
+                <div class="poi-summary-scroll">
+                  <div class="poi-summary-section"><span class="poi-summary-kicker">Current Region</span><strong id="poiSummaryRegion">Caribbean</strong></div>
+                  <div class="poi-summary-section"><span class="poi-summary-kicker">Active POI Categories</span><div id="poiSummaryCategories" class="poi-summary-list"></div></div>
+                  <div class="poi-summary-section"><span class="poi-summary-kicker">Active Filters</span><div id="poiSummaryFilters" class="poi-summary-list"></div></div>
+                </div>
+                <div class="poi-summary-actions">
+                  <button id="poiSummaryOpenFilters" class="primary" type="button">Edit Filters</button>
+                  <button id="poiSummaryClear" type="button">Clear Filters</button>
+                </div>
+              </section>
+            </div>
             <div class="map-action-row">
               <button id="filterButton" class="icon-button" type="button" aria-label="Filters">☷</button>
               <button id="scanButton" class="icon-button" type="button" aria-label="Animus Scan">⌁</button>
@@ -70,10 +86,14 @@
           <div id="activeFilterSummary" class="active-filter-summary"></div>
 
           <section id="viewport" class="viewport" aria-label="Interactive Caribbean map">
-            <div id="stage" class="stage">
-              <img class="map-image" src="./caribbean-map.jpg" alt="Caribbean map">
-              <svg id="routeLayer" class="route-layer" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
-              <div id="markerLayer" class="marker-layer"></div>
+            <div id="stage" class="stage extended-world-stage">
+              <img class="extended-world-background" src="./extended-world-background.jpg" alt="" aria-hidden="true">
+              <div id="playableArea" class="playable-area" aria-label="Black Flag playable area">
+                <img class="map-image" src="./caribbean-map.jpg" alt="Caribbean map">
+                <svg id="routeLayer" class="route-layer" viewBox="0 0 1000 1000" preserveAspectRatio="none"></svg>
+                <div id="markerLayer" class="marker-layer"></div>
+                <div class="playable-boundary-label" aria-hidden="true">Black Flag Playable Area</div>
+              </div>
             </div>
             <div id="scanWave" class="scan-wave"></div>
             <div class="map-controls">
@@ -126,6 +146,7 @@
   <section data-dev-page="database" hidden><div id="devDatabaseSummary" class="diagnostics-grid"></div><div id="devValidationResults" class="developer-results"></div><button id="devValidateDatabase" type="button">Run database validation</button></section>
   <section data-dev-page="storage" hidden><div id="devStorageSummary" class="diagnostics-grid"></div><div id="devStorageKeys" class="developer-results"></div></section>
   <section data-dev-page="logs" hidden><div class="button-grid"><button id="devExportDiagnostics" type="button">Export diagnostics</button><button id="devClearLogs" type="button">Clear diagnostic logs</button></div><div id="devRuntimeLogs" class="developer-results"></div></section>
+  <section data-dev-page="layout" hidden><div class="developer-results"><h3>Layout inspection</h3><p>Show the current safe interaction zones, floating anchors, and minimum touch targets directly over the app.</p><div class="button-grid"><button id="devToggleLayoutOverlay" type="button">Show layout overlay</button><button id="devCaptureFeedback" type="button">Export feedback capture</button></div><p id="devLayoutStatus" class="mode-explanation">Overlay is off. Feedback capture exports layout, map, viewport, active-tab, sheet, and release state without using the camera or microphone.</p></div></section>
   <section data-dev-page="maintenance" hidden>
     <label class="switch"><input id="devMaintenanceEnabled" type="checkbox"><span>Enable maintenance actions</span></label>
     <div id="devMaintenanceTools" class="button-grid" aria-disabled="true"><button id="devExportBackup" type="button" disabled>Export safety backup</button><button id="devRefreshIntegrity" type="button" disabled>Recheck integrity</button><button id="devUpdateServiceWorker" type="button" disabled>Check service-worker update</button><button id="devClearObsoleteCaches" type="button" disabled>Clear obsolete caches</button><button id="devCopyHealthSnapshot" type="button" disabled>Export health snapshot</button></div>
@@ -181,6 +202,6 @@
     <div id="detailContent"></div>
   </aside>
 
-  <script src="./release-identity.js?v=7.4.1"></script><script src="./database.js?v=7.4.1"></script><script src="./engine.js?v=7.4.1"></script><script src="./integrity.js?v=7.4.1"></script><script src="./app.js?v=7.4.1"></script><script src="./developer-console.js?v=7.4.1"></script>
+  <script src="./release-identity.js?v=7.6.3"></script><script src="./database.js?v=7.6.3"></script><script src="./engine.js?v=7.6.3"></script><script src="./integrity.js?v=7.6.3"></script><script src="./app.js?v=7.6.3"></script><script src="./developer-console.js?v=7.6.3"></script>
 </body>
 </html>

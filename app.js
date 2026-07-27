@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.4.1";
+  const APP_VERSION = RELEASE.version || "7.6.3";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -182,14 +182,65 @@
     return parts.length ? parts.join(" • ") : "All visible locations";
   }
 
+  function compactPoiSummary() {
+    const categories = data.filters.categories || [];
+    if (!categories.length) return "All visible locations";
+    if (categories.length === 1) return label(categories[0]);
+    if (categories.length <= 3) return `${label(categories[0])} +${categories.length - 1} more`;
+    return `${categories.length} active categories`;
+  }
+  function activeFilterLabels() {
+    const f = data.filters;
+    const labels = [];
+    if (f.hideCompleted) labels.push("Hide completed");
+    if (f.favoritesOnly) labels.push("Favorites only");
+    if (f.incompleteOnly) labels.push("Incomplete only");
+    if (f.discoveredOnly) labels.push("Discovered only");
+    if (f.verifiedOnly) labels.push("Verified only");
+    if (f.legacyOnly) labels.push("Legacy only");
+    if (query.trim()) labels.push(`Search: ${query.trim()}`);
+    return labels;
+  }
+  function renderPoiSummaryDropdown() {
+    const region = data.filters.region === "all" ? "Caribbean" : data.filters.region;
+    const categories = data.filters.categories || [];
+    const filters = activeFilterLabels();
+    $("poiSummaryRegion").textContent = region;
+    $("poiSummaryCategories").innerHTML = categories.length
+      ? categories.map(type => `<span class="poi-summary-item"><span aria-hidden="true">✓</span>${esc(label(type))}</span>`).join("")
+      : '<span class="poi-summary-empty">All Visible Locations</span>';
+    $("poiSummaryFilters").innerHTML = filters.length
+      ? filters.map(text => `<span class="poi-summary-item">${esc(text)}</span>`).join("")
+      : '<span class="poi-summary-empty">No Additional Filters</span>';
+  }
+  function setPoiSummaryOpen(open, { restoreFocus = false } = {}) {
+    const button = $("poiSummaryButton"), dropdown = $("poiSummaryDropdown");
+    if (!button || !dropdown) return;
+    dropdown.hidden = !open;
+    button.setAttribute("aria-expanded", String(open));
+    const categoryCount = (data.filters.categories || []).length;
+    const filterCount = activeFilterLabels().length;
+    const stateLabel = open ? "expanded" : "collapsed";
+    const summaryLabel = categoryCount ? `${categoryCount} active ${categoryCount === 1 ? "category" : "categories"}` : "all visible locations";
+    const extraLabel = filterCount ? `, ${filterCount} additional ${filterCount === 1 ? "filter" : "filters"}` : "";
+    button.setAttribute("aria-label", `Map filters, ${summaryLabel}${extraLabel}, ${stateLabel}`);
+    button.classList.toggle("open", open);
+    if (open) renderPoiSummaryDropdown();
+    else if (restoreFocus) button.focus({ preventScroll: true });
+  }
+  function togglePoiSummary() {
+    setPoiSummaryOpen($("poiSummaryDropdown").hidden);
+  }
+
   function renderOverview() {
     const visible = getVisibleLocations();
     const stats = completion(visible);
     $("visibleCompletion").textContent = `${stats.percent}%`;
     $("visibleCount").textContent = `${stats.total} visible`;
-    $("mapContext").textContent = filterDescription();
-    $("mapTitle").textContent = data.filters.categories.length === 1 ? label(data.filters.categories[0]) : "Caribbean Map";
-    $("activeFilterSummary").innerHTML = filterDescription() === "All visible locations" ? "" : filterDescription().split(" • ").map(text => `<span class="summary-chip">${esc(text)}</span>`).join("");
+    $("mapContext").textContent = compactPoiSummary();
+    $("mapTitle").textContent = data.filters.region === "all" ? "Caribbean" : data.filters.region;
+    $("activeFilterSummary").innerHTML = "";
+    renderPoiSummaryDropdown();
   }
 
   function clusterLocations(list) {
@@ -260,7 +311,7 @@
         button.onclick = event => {
           event.stopPropagation();
           const rect = $("viewport").getBoundingClientRect();
-          window.ACBF_MAP?.focusPercent?.(item.x, item.y, Math.max(2.2, (window.ACBF_MAP?.getState?.().scale || 1) * 1.6), rect.width / 2, rect.height / 2);
+          window.ACBF_MAP?.focusPercentSafe?.(item.x, item.y, Math.max(2.2, (window.ACBF_MAP?.getState?.().scale || 1) * 1.6), rect.width / 2, rect.height / 2);
           setTimeout(renderMarkers, 230);
         };
         host.appendChild(button);
@@ -395,6 +446,7 @@
   }
 
   function openLocation(id, focus = false) {
+    setPoiSummaryOpen(false);
     const location = byId(id); if (!location) return;
     selectedId = id; data.ui.selectedId = id; save();
     const state = stateFor(id);
@@ -459,7 +511,7 @@
   }
   function focusLocation(location) {
     const rect = $("viewport").getBoundingClientRect();
-    window.ACBF_MAP?.focusPercent?.(location.mapPosition.x, location.mapPosition.y, Math.max(2.35, window.ACBF_MAP?.getState?.().scale || 1), rect.width / 2, rect.height * .36);
+    window.ACBF_MAP?.focusPercentSafe?.(location.mapPosition.x, location.mapPosition.y, Math.max(2.35, window.ACBF_MAP?.getState?.().scale || 1), rect.width / 2, rect.height * .36);
     setTimeout(renderMarkers, 230);
   }
   function closeSheet() {
@@ -830,12 +882,14 @@
   }
 
   function switchTab(name) {
+    setPoiSummaryOpen(false);
     document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === name));
     document.querySelectorAll(".app-panel").forEach(panel => panel.classList.remove("active"));
     $(`${name}Panel`).classList.add("active");
     data.ui.activeTab = name; save(); if (name === "map") setTimeout(() => window.dispatchEvent(new Event("resize")), 30);
   }
   function setBrowser(open) {
+    if (open) setPoiSummaryOpen(false);
     browserOpen = open;
     document.body.classList.toggle("browser-open", open);
   }
@@ -844,6 +898,7 @@
   }
   function exitFullScreen() { document.body.classList.remove("app-fullscreen"); setBrowser(false); setTimeout(() => window.dispatchEvent(new Event("resize")), 50); }
   function openDrawer(id) {
+    setPoiSummaryOpen(false);
     $("modalBackdrop").hidden = false;
     requestAnimationFrame(() => { $("modalBackdrop").classList.add("show"); $(id).classList.add("open"); $(id).setAttribute("aria-hidden", "false"); });
   }
@@ -905,6 +960,12 @@
   function toggleMoreActions(){const menu=$("moreActionsMenu");if(!menu)return;if(menu.hidden)openMoreActions();else closeMoreActions();}
 
   // Events
+  $("poiSummaryButton").addEventListener("click", event => { event.stopPropagation(); togglePoiSummary(); });
+  $("poiSummaryDropdown").addEventListener("click", event => event.stopPropagation());
+  $("poiSummaryClear").onclick = () => { data.filters = clone(defaults.filters); query = ""; data.ui.query = ""; $("locationSearch").value = ""; save(); renderAll(); setPoiSummaryOpen(false, { restoreFocus: true }); toast("Map filters cleared"); };
+  $("poiSummaryOpenFilters").onclick = () => { setPoiSummaryOpen(false); openDrawer("filterDrawer"); };
+  document.addEventListener("pointerdown", event => { if (!event.target.closest(".poi-summary-control")) setPoiSummaryOpen(false); }, true);
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && !$("poiSummaryDropdown").hidden) { event.preventDefault(); setPoiSummaryOpen(false, { restoreFocus: true }); } });
   let searchRenderTimer=0;
   $("locationSearch").oninput=event=>{query=event.target.value;data.ui.query=query;save();clearTimeout(searchRenderTimer);searchRenderTimer=setTimeout(()=>{renderDirectory();renderMarkers();renderOverview();drawRoute();},90);};
   $("locationSearch").addEventListener("keydown",event=>{if(event.key==="Enter"){rememberSearch(event.target.value);event.target.blur();}});
@@ -1009,4 +1070,28 @@
       registration.addEventListener("updatefound", () => { const worker = registration.installing; worker?.addEventListener("statechange", () => { if (worker.state === "installed" && navigator.serviceWorker.controller) toast("Update available — tap Update now", () => location.reload()); const updateAction=$("toastUndo"); if(updateAction) updateAction.textContent="Update now"; }); });
     } catch (error) { console.error("Service worker registration failed", error); }
   });
+
+
+  // v7.6.1: keep every floating surface aligned to one visual-viewport model.
+  const syncSafeInteractionLayout = () => {
+    const vv = window.visualViewport;
+    const width = vv?.width || innerWidth;
+    const height = vv?.height || innerHeight;
+    window.ANIMUS_SET_DYNAMIC_STYLE?.(document.documentElement, {
+      "--visual-viewport-width": `${width}px`,
+      "--visual-viewport-height": `${height}px`,
+      "--visual-offset-top": `${vv?.offsetTop || 0}px`,
+      "--visual-offset-left": `${vv?.offsetLeft || 0}px`
+    });
+    window.dispatchEvent(new CustomEvent("animus:layout-change", {detail:{width,height,fullscreen:document.body.classList.contains("app-fullscreen")}}));
+  };
+  visualViewport?.addEventListener("resize", syncSafeInteractionLayout, {passive:true});
+  visualViewport?.addEventListener("scroll", syncSafeInteractionLayout, {passive:true});
+  window.addEventListener("orientationchange", () => setTimeout(syncSafeInteractionLayout, 80));
+  syncSafeInteractionLayout();
+
+  // v7.5 test: expose active map state to the full-screen layout without changing stored navigation.
+  const syncMapTabClass = () => document.body.classList.toggle("map-tab-active", document.getElementById("mapPanel")?.classList.contains("active"));
+  new MutationObserver(syncMapTabClass).observe(document.querySelector("main"), {subtree:true, attributes:true, attributeFilter:["class"]});
+  syncMapTabClass();
 })();
