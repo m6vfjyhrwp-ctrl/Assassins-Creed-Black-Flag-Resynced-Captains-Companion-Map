@@ -1,11 +1,11 @@
 {
-  "version": "7.6.8",
-  "name": "Route Planner Completion",
+  "version": "7.6.8.1",
+  "name": "Route Planner Viewport Refinement",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
   "released": "2026-07-27",
-  "buildId": "animus-v7.6.8-route-planner-completion-20260727",
+  "buildId": "animus-v7.6.8.1-route-planner-viewport-refinement-20260727",
   "releaseChannel": "production",
   "integrityManifestVersion": 2,
   "buildDate": "2026-07-27"

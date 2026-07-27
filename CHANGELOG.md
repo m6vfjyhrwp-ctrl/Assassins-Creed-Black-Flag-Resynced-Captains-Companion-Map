@@ -1,3 +1,7 @@
+# v7.6.8.1 — Route Planner Viewport Refinement
+
+- Enlarged route planner to show three route stops before scrolling on standard iPhone portrait viewports.
+
 ## 7.6.4 — Location Detail Sheet Scroll and Touch Repair
 
 - Restored scrollable location descriptions on touch devices.
@@ -215,6 +219,6 @@
 - Expanded onboarding into a four-step introduction covering the app purpose, map gestures, planning tools, local storage, backups, offline use, and replay access.
 - Preserved Developer Console v1, all 104 records, marker IDs, routes, progress, calibration, database version 9, user-data schema 3, and storage-key compatibility.
 
-## 7.6.8
+## 7.6.8.1
 - Completed the route-stop card interface and iPhone-compatible manual reordering.
 - Added Optimize Route and cleaned up route actions.

@@ -741,7 +741,7 @@ body.sheet-open .toast{bottom:max(calc(34dvh + 20px),calc(var(--ui-bottom) + 16p
 body.sheet-open #mapPanel .route-summary{display:none!important}
 
 
-/* v7.6.8 — completed iPhone-first route planner */
+/* v7.6.8.1 — completed iPhone-first route planner */
 #mapPanel .route-summary{display:flex;flex-direction:column;gap:10px;padding:14px!important}
 #mapPanel .route-summary .route-summary-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 #mapPanel .route-summary .route-summary-header div{display:grid;gap:2px}
@@ -766,7 +766,7 @@ body.route-reordering{user-select:none;-webkit-user-select:none}
 body.route-reordering #mapPanel .route-summary{overscroll-behavior:none}
 @media(max-width:390px){#mapPanel .route-summary #routeStopList li{grid-template-columns:30px minmax(0,1fr) 52px 56px;gap:4px;padding:6px}#mapPanel .route-summary .route-actions{gap:6px}}
 
-/* v7.6.8 — Phase 1 Route Planner Completion */
+/* v7.6.8.1 — Phase 1 Route Planner Completion */
 #mapPanel .route-summary{padding:0!important;overflow:hidden!important;display:flex;flex-direction:column}
 .route-planner-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px 10px;border-bottom:1px solid #2d4346;flex:0 0 auto}
 .route-planner-header>div{display:grid;gap:3px;min-width:0}.route-planner-header strong{font-size:1rem}.route-planner-header small{color:var(--muted);font-size:.7rem;white-space:normal}.route-close{width:44px;min-width:44px;height:44px;padding:0;margin:0!important;text-align:center!important;font-size:1.1rem}
@@ -780,3 +780,23 @@ body.route-reordering #mapPanel .route-summary{overscroll-behavior:none}
 .route-drag-ghost{position:fixed!important;z-index:500!important;left:0;top:0;width:min(88vw,510px);pointer-events:none;opacity:.94;box-shadow:0 16px 38px #000d;transform:translate3d(-200vw,-200vh,0);transition:none!important}body.route-reordering{user-select:none;-webkit-user-select:none;overflow:hidden}
 #mapPanel .route-summary .route-actions{grid-template-columns:repeat(3,minmax(0,1fr));margin:0!important;padding:10px 12px calc(10px + var(--safe-bottom))!important;bottom:0!important;flex:0 0 auto}#mapPanel .route-summary .route-actions button{padding:9px 6px!important;font-size:.72rem}
 @media(max-width:380px){.route-stop-card{grid-template-columns:28px 42px minmax(0,1fr) 42px;gap:3px}.route-stop-number{width:27px;height:27px}.route-stop-open{padding-inline:6px!important}#mapPanel .route-summary .route-actions{grid-template-columns:1fr 1fr}.route-actions .danger{grid-column:1/-1}}.reduce-motion .route-stop-card{transition:none}
+
+
+/* v7.6.8.1 — Phase 1 route planner viewport refinement */
+#mapPanel .route-summary{
+  max-height:min(64dvh,560px,calc(100dvh - var(--ui-top) - var(--ui-bottom) - 18px))!important;
+}
+#mapPanel .route-summary .route-stop-list{
+  max-height:300px;
+  flex:1 1 auto;
+}
+@media(max-width:520px){
+  #mapPanel .route-summary{
+    max-height:min(64dvh,560px,calc(100dvh - var(--ui-top) - var(--ui-bottom) - 18px))!important;
+  }
+  #mapPanel .route-summary .route-stop-list{max-height:300px;}
+}
+@media(max-height:700px){
+  #mapPanel .route-summary{max-height:min(60dvh,470px)!important;}
+  #mapPanel .route-summary .route-stop-list{max-height:250px;}
+}
