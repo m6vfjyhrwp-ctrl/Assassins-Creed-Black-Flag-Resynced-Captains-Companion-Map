@@ -1,11 +1,11 @@
 {
-  "version": "7.6.6",
-  "name": "Responsive Overlay and Map Action Repair",
+  "version": "7.6.7",
+  "name": "Marker Sheet and Route Overlay Repair",
   "databaseVersion": 9,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
   "released": "2026-07-27",
-  "buildId": "animus-v7.6.6-responsive-overlay-action-repair-20260727",
+  "buildId": "animus-v7.6.7-marker-sheet-route-overlay-repair-20260727",
   "releaseChannel": "production",
   "integrityManifestVersion": 2,
   "buildDate": "2026-07-27"

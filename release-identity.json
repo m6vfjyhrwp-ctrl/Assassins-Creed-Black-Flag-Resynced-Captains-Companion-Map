@@ -1,13 +1,13 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.6",
+  "version": "7.6.7",
   "releaseChannel": "production",
-  "buildId": "animus-v7.6.6-responsive-overlay-action-repair-20260727",
+  "buildId": "animus-v7.6.7-marker-sheet-route-overlay-repair-20260727",
   "buildDate": "2026-07-27",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
   "integrityManifestVersion": 2,
-  "serviceWorkerCache": "acbf-v7.6.6-responsive-overlay-action-repair",
+  "serviceWorkerCache": "acbf-v7.6.7-marker-sheet-route-overlay-repair",
   "copyrightOwner": "Stephen Vare",
   "officialRepository": "m6vfjyhrwp-ctrl/Assassins-Creed-Black-Flag-Companion-Map"
 }

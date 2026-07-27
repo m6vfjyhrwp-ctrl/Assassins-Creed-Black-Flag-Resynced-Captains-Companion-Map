@@ -1,18 +1,18 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.6.6",
-  "buildId": "animus-v7.6.6-responsive-overlay-action-repair-20260727",
+  "releaseVersion": "7.6.7",
+  "buildId": "animus-v7.6.7-marker-sheet-route-overlay-repair-20260727",
   "algorithm": "SHA-256",
   "files": [
     {
       "path": "index.html",
       "size": 23280,
-      "sha256": "947842e0f6f9ca93211eb06989e540af98e778534f48519eb9f6aa57b4e19709"
+      "sha256": "be1dc93274f0eb2ef71fac19c2b7e56a935e74c5d633844069d2ecc6d70c8c1b"
     },
     {
       "path": "styles.css",
-      "size": 64387,
-      "sha256": "8f001184c4892dc17e68af3371593763d116f045fc21f3a268ef1514738e40c1"
+      "size": 65043,
+      "sha256": "9a38aa0464fcc3632408e8d87bad0ed021d99b8055b8081cd45cfeaf22471f6d"
     },
     {
       "path": "startup-guard.js",
@@ -21,8 +21,8 @@
     },
     {
       "path": "release-identity.js",
-      "size": 483,
-      "sha256": "0dd1559f260dc15528c93ca2cf823b6acf3db51b3cb2a7b52b24b1a0ce7ac697"
+      "size": 485,
+      "sha256": "6b9fe69be55aa1d12912199cbb70e5c090e3914501e11742fd1c5a4853400cb1"
     },
     {
       "path": "integrity.js",
@@ -42,7 +42,7 @@
     {
       "path": "app.js",
       "size": 94306,
-      "sha256": "a4ac85bd08dd7d3dfb6be5935920cf7d1bb7f83b3af05313d2e304dd630ac7a3"
+      "sha256": "c9c349f78d416c8dd771f67e5abb266791f44a9fc39ab2c7c92e998dcab11df9"
     },
     {
       "path": "developer-console.js",
@@ -86,8 +86,8 @@
     },
     {
       "path": "manifest.webmanifest",
-      "size": 710,
-      "sha256": "6b0be9d94411df2293b8553f703d70d5672adc5f91da8dac0f849229e4f81161"
+      "size": 701,
+      "sha256": "85a7ca63a7f071b8fd33726e7e741d67b4e86cb69fc72941bf4876ca48f3b28b"
     },
     {
       "path": "icon-180.png",
@@ -106,13 +106,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 360,
-      "sha256": "e038a90df093bfc14e2de873cfd4cf522ffc029222a4dba5b80af66dc31ad5a8"
+      "size": 358,
+      "sha256": "cbd0e0a6a29ab91b874ffa89ee1c2b093019c87c6b78d941c8d2933935527abc"
     },
     {
       "path": "release-identity.json",
-      "size": 480,
-      "sha256": "c97c6d18736c8a6832c3d73b6a8be76dd608d73ba41368ccac7a83e991eeb465"
+      "size": 482,
+      "sha256": "b06cf37449271f9190680e108288f5d8acb2709ff71494154ce132061021f92a"
     }
   ],
   "generatedAt": "2026-07-27T22:30:00Z"

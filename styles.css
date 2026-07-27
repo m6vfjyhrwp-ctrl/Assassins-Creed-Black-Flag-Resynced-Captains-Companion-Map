@@ -727,3 +727,15 @@ body.sheet-open .toast{bottom:max(calc(34dvh + 20px),calc(var(--ui-bottom) + 16p
 @media(max-width:520px){
   #mapPanel .route-summary{width:calc(100vw - 24px)!important;max-height:36dvh!important}
 }
+
+/* v7.6.7 — Marker Sheet Touch and Route Overlay Isolation Repair */
+/* The sheet backdrop must dim the map without sitting above the interactive sheet. */
+.sheet-backdrop{z-index:175!important;pointer-events:none!important}
+.sheet-backdrop.show{pointer-events:auto!important}
+.detail-sheet{z-index:180!important;pointer-events:auto!important}
+.modal-backdrop{z-index:190!important}
+.drawer{z-index:200!important}
+
+/* A marker detail sheet owns the lower interaction zone. Keep the inline route card
+   out of the way until the marker sheet closes; the route itself remains preserved. */
+body.sheet-open #mapPanel .route-summary{display:none!important}

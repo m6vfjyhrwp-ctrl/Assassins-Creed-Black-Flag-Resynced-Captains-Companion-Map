@@ -1,13 +1,13 @@
 {
-  "name": "Animus Companion 7.6.6 Responsive Overlay and Map Action Repair",
-  "short_name": "Animus 7.6.6",
-  "description": "Production map interface with restored iPhone scrolling and touch handling in location detail sheets.",
+  "name": "Animus Companion 7.6.7 Marker Sheet and Route Overlay Repair",
+  "short_name": "Animus 7.6.7",
+  "description": "Production map interface with restored marker-sheet touch handling and isolated route controls.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#030708",
   "theme_color": "#050a0b",
-  "id": "./?pwa=v764",
+  "id": "./?pwa=v767",
   "categories": [
     "games",
     "utilities"
