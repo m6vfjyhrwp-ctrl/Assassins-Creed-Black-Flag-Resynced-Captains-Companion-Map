@@ -1,18 +1,18 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.6.9",
-  "buildId": "animus-v7.6.9-phase-1-route-planner-finalization-20260727",
+  "releaseVersion": "7.6.10",
+  "buildId": "animus-v7.6.10-phase-1-route-planner-completion-20260727",
   "algorithm": "SHA-256",
   "files": [
     {
       "path": "index.html",
-      "size": 23274,
-      "sha256": "3deddd78f3b8df6903b4c4ec27ce1450622ef4c2db3dc98f0dbef438d97d3abe"
+      "size": 22098,
+      "sha256": "94f3478ecc7ef999603fc8337a5149d00776bcbafdb5ddd2ea324d4150543aee"
     },
     {
       "path": "styles.css",
-      "size": 73333,
-      "sha256": "8e289ba32982a79162df0ca36015a9210d51184f636957b50ba80a00f75eb99b"
+      "size": 73767,
+      "sha256": "fdbb484fe4b5ea4d20ee9a2bec25722747dc6a1afef18cfb7aefa401860b1745"
     },
     {
       "path": "startup-guard.js",
@@ -21,8 +21,8 @@
     },
     {
       "path": "release-identity.js",
-      "size": 473,
-      "sha256": "1bce9b4f2f991043787f67be1ec0ca22da73c138b1cea0aa6ee994a0938ad55c"
+      "size": 472,
+      "sha256": "56cf3aea05cc9f8e7dadb45e02b4d8df5bca6397348c186f806e048e9775fdd0"
     },
     {
       "path": "integrity.js",
@@ -41,8 +41,8 @@
     },
     {
       "path": "app.js",
-      "size": 98952,
-      "sha256": "4eec37ef8fe1c4765c7df9a198dd1fc88f7466cdd4e04766a214f9e79bcf55f8"
+      "size": 99271,
+      "sha256": "a178c967be92ca0a2deb688a691b3f4a668f5791c508317957acd177f03e29f8"
     },
     {
       "path": "developer-console.js",
@@ -87,7 +87,7 @@
     {
       "path": "manifest.webmanifest",
       "size": 698,
-      "sha256": "96dd968343950d8b332e4de34a3eb66890e707d7b4ce9b8e53f9f8045eac6c0d"
+      "sha256": "96be2c869b668c275bc1b6d49d7ed5c722b9500f78990f3c0bad7365d797af0f"
     },
     {
       "path": "icon-180.png",
@@ -106,13 +106,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 356,
-      "sha256": "33bd353aa7b06e21ac2a02d855ab7563ab1d151b9f30a6fd657d4953cd3daa6f"
+      "size": 429,
+      "sha256": "87c0cf5040b91cb7e04c959a2d6f3bbcccb9a90493b77968b2a4d63e09aa2a27"
     },
     {
       "path": "release-identity.json",
-      "size": 484,
-      "sha256": "540caa0c091d80b4678660515b063c6c5aee4cd3e1e25cca6390c557b8899164"
+      "size": 483,
+      "sha256": "85470743e2a2079ec37a990ff325d53fe96190614fdcdb2acf15207c5ee19032"
     }
   ]
 }

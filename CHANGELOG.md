@@ -1,4 +1,10 @@
-# v7.6.9 — Phase 1 Route Planner Finalization
+# Changelog
+
+## 7.6.10
+- Replaced the duplicate route-builder drawer with one Route Planner entry point.
+- Added an intentional empty state and explicit Create Route action.
+- Preserved current-route management and iPhone-first layout.
+
 
 - Enlarged route planner to show three route stops before scrolling on standard iPhone portrait viewports.
 

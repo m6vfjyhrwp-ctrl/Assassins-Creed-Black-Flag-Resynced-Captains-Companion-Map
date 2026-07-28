@@ -5,7 +5,7 @@
   const STORE = "acbf-companion-m3";
   const BACKUP_FORMAT = "animus-companion-backup";
   const RELEASE = window.ANIMUS_RELEASE_IDENTITY || {};
-  const APP_VERSION = RELEASE.version || "7.6.8.1";
+  const APP_VERSION = RELEASE.version || "7.6.10";
   const STATUS_VALUES = ["not-started", "discovered", "attempted", "completed", "needs-recheck"];
   const MODE_COPY = {
     normal: "Balanced visibility. All stored locations are visible with full details.",
@@ -73,6 +73,7 @@
   let searchAcrossAll = !!data.ui?.searchAcrossAll;
   let devTaps = 0;
   let browserOpen = false;
+  let routePlannerOpen = data.route.ids.length > 0;
   let sheetTouchStart = null;
   let contextLocationId = null;
   let suppressMarkerClickUntil = 0;
@@ -577,6 +578,11 @@
     }
     return best;
   }
+  function createRouteFromVisible() {
+    data.route.source = "visible-incomplete";
+    data.route.strategy = "nearest";
+    buildRoute();
+  }
   function buildRoute() {
     let candidates = routeCandidates();
     if (data.settings.routeSkipCompleted) candidates = candidates.filter(location => stateFor(location.id).status !== "completed");
@@ -590,7 +596,8 @@
       if (data.route.strategy === "shortest") candidates = improveRoute2Opt(candidates);
     }
     data.route.ids = candidates.map(location => location.id);
-    save(); drawRoute(); renderAll(); closeDrawer("routeDrawer"); toast(`Route built with ${candidates.length} visible stop${candidates.length === 1 ? "" : "s"}`);
+    routePlannerOpen = true;
+    save(); drawRoute(); renderAll(); toast(`Route created with ${candidates.length} visible stop${candidates.length === 1 ? "" : "s"}`);
   }
   function reorderRoute(fromId, toId, placeAfter = false) {
     if (!fromId || !toId || fromId === toId) return false;
@@ -669,21 +676,29 @@
     const routeLayer = $("routeLayer");
     if (route.length < 2) routeLayer.innerHTML = "";
     else routeLayer.innerHTML = `<polyline class="route-line" points="${route.map(location => `${location.mapPosition.x * 10},${location.mapPosition.y * 10}`).join(" ")}"></polyline>`;
-    if (!route.length) { $("routeSummary").hidden = true; $("routeSummary").innerHTML = ""; return; }
-    const distance = routeDistance(route), warnings = unique(route.flatMap(location => locationReadiness(location).missing));
+    if (!routePlannerOpen) { $("routeSummary").hidden = true; return; }
     $("routeSummary").hidden = false;
+    if (!route.length) {
+      $("routeSummary").innerHTML = `<header class="route-planner-header"><div><strong>Route Planner</strong><small>No active route</small></div><button id="closeRouteSummary" class="route-close" aria-label="Hide route planner">⌄</button></header><div class="route-empty-state"><strong>No Active Route</strong><p>Create a route from the locations currently visible on the map when you are ready.</p><button id="createRouteInline" class="primary">Create Route</button></div>`;
+      $("createRouteInline").onclick = createRouteFromVisible;
+      $("closeRouteSummary").onclick = () => { routePlannerOpen = false; $("routeSummary").hidden = true; toast("Route planner hidden"); };
+      return;
+    }
+    const distance = routeDistance(route), warnings = unique(route.flatMap(location => locationReadiness(location).missing));
     $("routeSummary").innerHTML = `<header class="route-planner-header"><div><strong>${route.length} route stop${route.length === 1 ? "" : "s"}</strong><small>${distance.toFixed(1)} map units • about ${Math.max(5, Math.round(distance * 1.6))} min sailing</small></div><button id="closeRouteSummary" class="route-close" aria-label="Hide route planner">⌄</button></header>${warnings.length ? `<p class="route-warning">⚠ ${esc(warnings.slice(0, 4).join(" • "))}</p>` : ""}<ol id="routeStopList" class="route-stop-list">${route.map((location,index) => `<li class="route-stop-card" draggable="true" data-route-id="${location.id}"><span class="route-stop-number" aria-hidden="true">${index + 1}</span><button class="route-drag-handle route-stop-open" data-route-open="${location.id}" aria-label="${esc(location.name)}, ${esc(location.gameCoordinates)}. Drag to reorder or tap to open"><span class="route-grip" aria-hidden="true">☰</span><span class="route-stop-label"><b>${esc(location.name)}</b><span class="route-label-separator" aria-hidden="true"> — </span><small>${esc(location.gameCoordinates)}</small></span></button><button class="route-stop-remove" data-route-remove="${location.id}" aria-label="Remove ${esc(location.name)} from route">✕</button></li>`).join("")}</ol><div class="route-actions"><button id="reverseRouteInline">Reverse</button><button id="optimizeRouteInline">Optimize</button><button id="clearRouteInline" class="danger">Clear route</button></div>`;
     document.querySelectorAll("[data-route-open]").forEach(button => button.onclick = () => openLocation(button.dataset.routeOpen, true));
     document.querySelectorAll("[data-route-remove]").forEach(button => button.onclick = () => { data.route.ids=data.route.ids.filter(id=>id!==button.dataset.routeRemove); save(); drawRoute(); renderMarkers(); toast("Route stop removed"); });
     bindRouteReordering();
     $("reverseRouteInline").onclick = reverseRoute; $("optimizeRouteInline").onclick = optimizeCurrentRoute; $("clearRouteInline").onclick = clearRoute;
-    $("closeRouteSummary").onclick = () => { $("routeSummary").hidden = true; toast("Route planner hidden"); };
+    $("closeRouteSummary").onclick = () => { routePlannerOpen = false; $("routeSummary").hidden = true; toast("Route planner hidden"); };
   }
   function reverseRoute() { data.route.ids.reverse(); save(); drawRoute(); renderMarkers(); toast("Route reversed"); }
-  function clearRoute() { data.route.ids = []; save(); drawRoute(); renderMarkers(); toast("Route cleared"); }
+  function clearRoute() { data.route.ids = []; routePlannerOpen = true; save(); drawRoute(); renderMarkers(); toast("Route cleared"); }
   function renderRouteCandidateSummary() {
+    const summary = $("routeCandidateSummary");
+    if (!summary) return;
     const candidates = routeCandidates();
-    $("routeCandidateSummary").innerHTML = `<strong>${candidates.length} eligible visible location${candidates.length === 1 ? "" : "s"}</strong><p>Hidden markers are excluded automatically. ${data.route.source === "manual" ? `${data.route.manualIds.length} manually selected.` : ""}</p>`;
+    summary.innerHTML = `<strong>${candidates.length} eligible visible location${candidates.length === 1 ? "" : "s"}</strong><p>Hidden markers are excluded automatically.</p>`;
   }
 
   function renderJackdaw() {
@@ -971,9 +986,17 @@
   }
   function closeDrawer(id) {
     $(id).classList.remove("open"); $(id).setAttribute("aria-hidden", "true");
-    if (!["filterDrawer", "routeDrawer"].some(drawerId => $(drawerId).classList.contains("open"))) {
+    if (!$("filterDrawer").classList.contains("open")) {
       $("modalBackdrop").classList.remove("show"); setTimeout(() => $("modalBackdrop").hidden = true, 220);
     }
+  }
+  function openRoutePlanner() {
+    setPoiSummaryOpen(false);
+    closeMoreActions();
+    routePlannerOpen = true;
+    switchTab("map");
+    drawRoute();
+    requestAnimationFrame(() => $("routeSummary")?.querySelector("button")?.focus({ preventScroll: true }));
   }
   function runScan() {
     const wave = $("scanWave"); wave.classList.remove("active"); void wave.offsetWidth; wave.classList.add("active");
@@ -1052,10 +1075,9 @@
   $("brandHome").onclick = () => switchTab("map");
   $("closeBrowser").onclick = () => setBrowser(false);
   $("filterButton").onclick = () => openDrawer("filterDrawer");
-  $("routeButton").onclick = () => openDrawer("routeDrawer");
+  $("routeButton").onclick = openRoutePlanner;
   $("closeFilterDrawer").onclick = () => closeDrawer("filterDrawer");
-  $("closeRouteDrawer").onclick = () => closeDrawer("routeDrawer");
-  $("modalBackdrop").onclick = () => { closeDrawer("filterDrawer"); closeDrawer("routeDrawer"); };
+  $("modalBackdrop").onclick = () => closeDrawer("filterDrawer");
   $("applyFilters").onclick = () => { save(); closeDrawer("filterDrawer"); renderAll(); };
   $("clearFilters").onclick = () => { data.filters = clone(defaults.filters); save(); renderAll(); };
   ["hideCompleted", "favoritesOnly", "incompleteOnly", "discoveredOnly", "verifiedOnly", "legacyOnly"].forEach(key => $(key).onchange = event => {
@@ -1065,17 +1087,12 @@
     renderFilterState();
   });
   $("regionFilter").onchange = event => { data.filters.region = event.target.value; save(); renderAll(); };
-  $("routeSource").onchange = event => { data.route.source = event.target.value; save(); renderRouteCandidateSummary(); };
-  $("routeStrategy").onchange = event => { data.route.strategy = event.target.value; save(); };
-  $("buildRoute").onclick = buildRoute; $("reverseRoute").onclick = reverseRoute; $("clearRoute").onclick = clearRoute;
-  $("openCurrentObjective").onclick = () => { closeDrawer("routeDrawer"); openCurrentObjective(); };
-  $("chooseAnotherObjective").onclick = () => { const next = chooseNextObjective(true); if (!next) return toast("No other incomplete visible objective"); closeDrawer("routeDrawer"); openLocation(next.id, true); toast("Next objective updated"); };
   $("scanButton").onclick = runScan;
   $("nearestButton").onclick = nearestToMapCenter;
   const moreButton=$("moreActionsButton"), moreMenu=$("moreActionsMenu");
   moreButton.addEventListener("pointerup",event=>{event.preventDefault();event.stopPropagation();toggleMoreActions();});
   moreButton.addEventListener("click",event=>{event.preventDefault();event.stopPropagation();});
-  moreMenu.addEventListener("click",event=>{const action=event.target.closest("[data-more-action]")?.dataset.moreAction;if(!action)return;event.stopPropagation();closeMoreActions();if(action==="filters")openDrawer("filterDrawer");if(action==="scan")runScan();if(action==="route")openDrawer("routeDrawer");if(action==="nearest")nearestToMapCenter();});
+  moreMenu.addEventListener("click",event=>{const action=event.target.closest("[data-more-action]")?.dataset.moreAction;if(!action)return;event.stopPropagation();closeMoreActions();if(action==="filters")openDrawer("filterDrawer");if(action==="scan")runScan();if(action==="route")openRoutePlanner();if(action==="nearest")nearestToMapCenter();});
   moreMenu.addEventListener("keydown",event=>{const items=[...moreMenu.querySelectorAll('[role="menuitem"]')],index=items.indexOf(document.activeElement);if(event.key==="Escape"){event.preventDefault();closeMoreActions({restoreFocus:true});}else if(event.key==="ArrowDown"){event.preventDefault();items[(index+1+items.length)%items.length]?.focus();}else if(event.key==="ArrowUp"){event.preventDefault();items[(index-1+items.length)%items.length]?.focus();}});
   document.addEventListener("pointerdown",event=>{if(performance.now()-moreActionsOpenedAt<120)return;if(!event.target.closest("#moreActionsMenu")&&!event.target.closest("#moreActionsButton"))closeMoreActions();},true);
   window.addEventListener("resize",positionMoreActions);

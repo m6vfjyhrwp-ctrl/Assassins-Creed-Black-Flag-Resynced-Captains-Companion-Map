@@ -813,3 +813,10 @@ body.route-reordering #mapPanel .route-summary{overscroll-behavior:none}
 #mapPanel .route-summary .route-label-separator{color:var(--muted)}
 #mapPanel .route-summary .route-stop-remove{min-width:44px!important}
 @media(max-width:380px){#mapPanel .route-summary .route-stop-card{grid-template-columns:28px minmax(0,1fr) 42px!important;gap:4px!important}#mapPanel .route-summary .route-drag-handle.route-stop-open{gap:7px!important;padding-inline:8px!important}.route-label-separator{display:none}.route-stop-label small{display:block;margin-top:2px}}
+
+
+/* v7.6.10 — one Route Planner entry point and intentional empty state */
+.route-empty-state{display:grid;justify-items:center;gap:10px;padding:28px 22px 30px;text-align:center;min-height:210px;align-content:center}
+.route-empty-state strong{font-size:1.05rem}
+.route-empty-state p{margin:0;max-width:30rem;color:var(--muted);font-size:.78rem;line-height:1.5}
+.route-empty-state .primary{min-width:min(240px,100%);margin-top:4px}
