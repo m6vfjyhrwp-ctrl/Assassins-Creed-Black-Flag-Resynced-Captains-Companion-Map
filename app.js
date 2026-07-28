@@ -95,15 +95,22 @@
     return data.locations[id] ||= { status: "not-started", favorite: false, note: "", checklist: {} };
   }
   let activeToastToken = 0;
+
+  // Phase 2 polish: restrained tactile feedback where the platform supports it.
+  function haptic(kind = "selection") {
+    if (data?.settings?.reduceMotion) return;
+    const pattern = kind === "success" ? [12, 24, 18] : kind === "warning" ? [18, 35, 18] : 8;
+    try { navigator.vibrate?.(pattern); } catch (_) {}
+  }
   function toast(message, undoAction = null) {
     const element = $("toast");
     const token = ++activeToastToken;
     clearTimeout(element.timer); clearTimeout(element.hideTimer);
     element.classList.remove("toast-leaving");
     element.innerHTML = `<span>${esc(message)}</span>${undoAction ? '<button id="toastUndo" type="button">Undo</button>' : ''}`;
-    element.hidden = false; element.setAttribute("role", "status"); element.setAttribute("aria-atomic", "true");
+    element.hidden = false; requestAnimationFrame(() => element.classList.add("toast-visible")); element.setAttribute("role", "status"); element.setAttribute("aria-atomic", "true");
     let remaining = 3000, startedAt = performance.now();
-    const finish = () => { if (token !== activeToastToken) return; element.classList.add("toast-leaving"); element.hideTimer=setTimeout(()=>{ if(token===activeToastToken){element.hidden=true;element.classList.remove("toast-leaving");}},190); };
+    const finish = () => { if (token !== activeToastToken) return; element.classList.add("toast-leaving"); element.hideTimer=setTimeout(()=>{ if(token===activeToastToken){element.hidden=true;element.classList.remove("toast-leaving","toast-visible");}},190); };
     const schedule = () => { clearTimeout(element.timer); startedAt=performance.now(); element.timer=setTimeout(finish,remaining); };
     const pause = () => { clearTimeout(element.timer); remaining=Math.max(0,remaining-(performance.now()-startedAt)); };
     const resume = () => remaining<=0 ? finish() : schedule();
@@ -300,6 +307,7 @@
   function renderMarkers() {
     const host = $("markerLayer");
     host.innerHTML = "";
+    const fragment = document.createDocumentFragment();
     const routeIndex = new Map(data.route.ids.map((id, i) => [id, i + 1]));
     clusterLocations(getVisibleLocations()).forEach(item => {
       if (item.kind === "cluster") {
@@ -311,11 +319,12 @@
         button.setAttribute("aria-label", `${item.group.length} nearby locations`);
         button.onclick = event => {
           event.stopPropagation();
+          haptic("selection");
           const rect = $("viewport").getBoundingClientRect();
           window.ACBF_MAP?.focusPercentSafe?.(item.x, item.y, Math.max(2.2, (window.ACBF_MAP?.getState?.().scale || 1) * 1.6), rect.width / 2, rect.height / 2);
           setTimeout(renderMarkers, 230);
         };
-        host.appendChild(button);
+        fragment.appendChild(button);
         return;
       }
       const location = item.location;
@@ -345,8 +354,9 @@
       ["pointerup", "pointercancel", "pointerleave"].forEach(type => button.addEventListener(type, () => clearTimeout(longPressTimer)));
       button.addEventListener("contextmenu", event => { event.preventDefault(); openMarkerContext(location.id, event.clientX, event.clientY); });
       button.addEventListener("click", event => { if (Date.now() < suppressMarkerClickUntil) return; event.stopPropagation(); closeMarkerContext(); openLocation(location.id); });
-      host.appendChild(button);
+      fragment.appendChild(button);
     });
+    host.appendChild(fragment);
   }
 
   function closeMarkerContext() {
@@ -447,6 +457,7 @@
   }
 
   function openLocation(id, focus = false) {
+    haptic("selection");
     setPoiSummaryOpen(false);
     const location = byId(id); if (!location) return;
     selectedId = id; data.ui.selectedId = id; save();
@@ -668,6 +679,7 @@
         handle.addEventListener("pointercancel", cleanup, { once:true });
       });
     });
+    host.appendChild(fragment);
   }
   function drawRoute() {
     const visibleIds = new Set(getVisibleLocations().map(location => location.id));
@@ -964,6 +976,7 @@
   }
 
   function switchTab(name) {
+    haptic("selection");
     setPoiSummaryOpen(false);
     document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === name));
     document.querySelectorAll(".app-panel").forEach(panel => panel.classList.remove("active"));
@@ -1151,6 +1164,12 @@
   const legacyExportDiagnostics=$("exportDiagnostics"); if(legacyExportDiagnostics) legacyExportDiagnostics.onclick = () => download("animus-diagnostics.json", { appVersion: APP_VERSION, databaseVersion: window.ACBF_DATABASE_VERSION, records: locations.length, visibleRecords: getVisibleLocations({ ignoreQuery: true }).length, filters: data.filters, route: data.route, settings: data.settings, stateCounts: STATUS_VALUES.map(status => [status, locations.filter(location => stateFor(location.id).status === status).length]) });
 
   window.addEventListener("animus:integrity-complete", event => { const status=event.detail?.status||"Integrity Not Verified",button=$("versionButton"),text=$("releaseStatusText"); if(text)text.textContent=status; if(button){button.classList.remove("release-status-official","release-status-modified","release-status-failed","release-status-unverified");button.classList.add(status==="Official Release"?"release-status-official":status==="Modified Build"?"release-status-modified":status==="Integrity Check Failed"?"release-status-failed":"release-status-unverified");} try { renderSettings(); } catch (_) {} });
+  document.addEventListener("pointerdown", event => {
+    const target = event.target.closest("button, .file-button, [role=button]");
+    if (target && !target.disabled) target.classList.add("is-pressing");
+  }, { passive: true });
+  document.addEventListener("pointerup", event => event.target.closest("button, .file-button, [role=button]")?.classList.remove("is-pressing"), { passive: true });
+  document.addEventListener("pointercancel", () => document.querySelectorAll(".is-pressing").forEach(el => el.classList.remove("is-pressing")), { passive: true });
   window.addEventListener("error", event => { console.error(event.error || event.message); toast("A recoverable app error occurred"); });
   $("locationSearch").value=query; $("searchAllLocations").checked=searchAcrossAll; $("detailSheet").dataset.size=data.ui.sheetSize||"half"; runStartupRegressionTests();
   renderAll(); switchTab(data.ui.activeTab||"map"); setTimeout(runStartupRegressionTests, 350); setTimeout(()=>{ if(data.mapView?.scale>1.001) window.ACBF_MAP?.setState?.(data.mapView); if(selectedId) openLocation(selectedId,false); showOnboarding(false); },120);

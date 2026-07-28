@@ -1,12 +1,12 @@
 {
   "applicationName": "Animus Companion",
-  "version": "7.6.10",
-  "buildId": "animus-v7.6.10-phase-1-route-planner-completion-20260727",
+  "version": "7.7.0",
+  "buildId": "animus-v7.7.0-phase-2-polish-sprint-1-20260728",
   "releaseChannel": "production",
   "milestone": "Responsive Overlay and Map Action Repair",
   "sourceBaseline": "7.6.3",
   "databaseVersion": 9,
   "userDataSchemaVersion": 3,
-  "buildDate": "2026-07-27",
+  "buildDate": "2026-07-28",
   "releaseName": "Phase 1 Route Planner Completion"
 }

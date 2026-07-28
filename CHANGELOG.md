@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.7.0
+
+- Began Phase 2 polish without adding new product features.
+- Unified touch-down feedback and reduced accidental double-tap delay.
+- Refined marker selection, sheet, toast, button, and list transitions.
+- Added restrained platform haptics where supported.
+- Batched marker insertion through a document fragment to reduce layout churn.
+- Improved typography, scrolling, reduced-motion behavior, and input sizing on iPhone.
+- Preserved database version 9, user-data schema 3, storage key, routes, backups, and calibration.
+
 ## 7.6.10
 - Replaced the duplicate route-builder drawer with one Route Planner entry point.
 - Added an intentional empty state and explicit Create Route action.
