@@ -679,7 +679,6 @@
         handle.addEventListener("pointercancel", cleanup, { once:true });
       });
     });
-    host.appendChild(fragment);
   }
   function drawRoute() {
     const visibleIds = new Set(getVisibleLocations().map(location => location.id));
@@ -925,6 +924,8 @@
       ["dom:progressPanel", !!$("progressPanel")],
       ["dom:logPanel", !!$("logPanel")],
       ["dom:settingsPanel", !!$("settingsPanel")],
+      ["nav:noDedicatedMayanTab", !document.querySelector('.tab[data-tab="mayan"]') && !$("mayanPanel")],
+      ["data:mayanStoneCategory", locations.filter(location => location.type === "mayan-stone").length === 16],
       ["map:geometryAvailable", !!window.ACBF_MAP?.getGeometry?.()],
       ["map:sourceAspectRatioPreserved", Math.abs((window.ACBF_MAP?.getGeometry?.().aspect || 0) - (1944 / 1665)) < 0.0001],
       ["map:allDatabaseMarkersInBounds", locations.every(location => Number.isFinite(location.mapPosition?.x) && Number.isFinite(location.mapPosition?.y) && location.mapPosition.x >= 0 && location.mapPosition.x <= 100 && location.mapPosition.y >= 0 && location.mapPosition.y <= 100)],
@@ -972,26 +973,20 @@
     ["hideCompleted", "favoritesOnly", "incompleteOnly", "discoveredOnly", "verifiedOnly", "legacyOnly"].forEach(key => $(key).checked = !!data.filters[key]);
   }
 
-  function renderMayanStones() {
-    const host = $("mayanStoneList"), summary = $("mayanStoneSummary");
-    if (!host || !summary) return;
-    const stones = locations.filter(l => l.type === "mayan-stone");
-    const done = stones.filter(l => data.completed[l.id]).length;
-    summary.innerHTML = `<div class="metric"><span>Collected</span><strong>${done} / ${stones.length}</strong></div><div class="metric"><span>Remaining</span><strong>${stones.length-done}</strong></div><div class="metric"><span>Reward</span><strong>${done===stones.length?'Unlocked':'Tulum'}</strong></div>`;
-    host.innerHTML = stones.map((l,i)=>`<button class="location-row" data-mayan-open="${l.id}"><span>${data.completed[l.id]?'✓':'◈'}</span><span><strong>${i+1}. ${esc(l.name)}</strong><small>${esc(l.region)} · ${data.completed[l.id]?'Collected':'Not collected'}</small></span><span class="coord">${esc(l.gameCoordinates)}</span></button>`).join('');
-    document.querySelectorAll('[data-mayan-open]').forEach(b=>b.onclick=()=>{switchTab('map');openLocation(b.dataset.mayanOpen,true)});
-  }
 
   function renderAll() {
-    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderMayanStones(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
+    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
   }
 
   function switchTab(name) {
+    const requested = String(name || "map");
+    const targetPanel = $(`${requested}Panel`);
+    name = targetPanel && document.querySelector(`.tab[data-tab="${requested}"]`) ? requested : "map";
     haptic("selection");
     setPoiSummaryOpen(false);
     document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === name));
     document.querySelectorAll(".app-panel").forEach(panel => panel.classList.remove("active"));
-    $(`${name}Panel`).classList.add("active");
+    $(`${name}Panel`)?.classList.add("active");
     data.ui.activeTab = name; save(); if (name === "map") setTimeout(() => window.dispatchEvent(new Event("resize")), 30);
   }
   function setBrowser(open) {

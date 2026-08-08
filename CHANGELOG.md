@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.7.3 — 2026-08-08
+- Removed the dedicated Mayan Stones primary-navigation tab while preserving all 16 Mayan Stone POIs under standard filters/search.
+- Fixed Mayan-tab runtime error and Route Planner `host` ReferenceError.
+- Added backward-safe navigation fallback and regression coverage.
+
+
 ## 7.7.0
 
 - Began Phase 2 polish without adding new product features.

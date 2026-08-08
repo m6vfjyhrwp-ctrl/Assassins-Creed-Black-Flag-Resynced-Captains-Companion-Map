@@ -1,13 +1,13 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.7.2",
-  "buildId": "animus-v7.7.2-mayan-stones-20260808",
+  "releaseVersion": "7.7.3",
+  "buildId": "animus-v7.7.3-navigation-cleanup-20260808",
   "algorithm": "SHA-256",
   "files": [
     {
       "path": "index.html",
-      "size": 22567,
-      "sha256": "2250a41778baac795c002b30d5d054780c6dfc24fa3c5856f4aeb472e2266de9"
+      "size": 22080,
+      "sha256": "af3504e6ef6cd2579c3bd8cfba2ec6447668a70b3ff564440488890b86b49069"
     },
     {
       "path": "styles.css",
@@ -21,8 +21,8 @@
     },
     {
       "path": "release-identity.js",
-      "size": 430,
-      "sha256": "acb1bf5144936cda3ef955afd3a3f489cac2c2184f4075c3d560b241762fd380"
+      "size": 442,
+      "sha256": "7837b510875ae7f534bfc91a33471968d88533e6e729d9b053b06b75f3a79676"
     },
     {
       "path": "integrity.js",
@@ -41,8 +41,8 @@
     },
     {
       "path": "app.js",
-      "size": 101548,
-      "sha256": "84255f4ffb4316d0a91fb5ee82a0ebeac1cb27c40ce022fb43a7618d07dc7d26"
+      "size": 100832,
+      "sha256": "cd6f21e62fabc8a70675ff550c953e06eb68e1f19730404e35423050a38672e1"
     },
     {
       "path": "developer-console.js",
@@ -86,8 +86,8 @@
     },
     {
       "path": "manifest.webmanifest",
-      "size": 678,
-      "sha256": "a9bb79b81e12a74574ba7892bd8e98c52a24397bf3150da85b8bb87471e1cfff"
+      "size": 682,
+      "sha256": "01aa62a1eb93fa5179221e2bf53621ac2f6e74371a7a02de199ab111e0bb96bb"
     },
     {
       "path": "icon-180.png",
@@ -106,13 +106,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 365,
-      "sha256": "19a52fba8db5942e45b5510c502db4d4f3be1c2b629c5b3dcb87299d45753037"
+      "size": 400,
+      "sha256": "5afffb531e33ad10acc86436f81f465a5fd79db26b6b3962962bd99623c3be0e"
     },
     {
       "path": "release-identity.json",
-      "size": 441,
-      "sha256": "471d7a5011fc53769acfb1fc63f5596d80451d665ef0741d5665a5f569ed2c4d"
+      "size": 453,
+      "sha256": "42ac33d2a8a7072540b387e63cd234e008f4b747e91355f5dffbc22d8f4132d1"
     }
   ]
 }
