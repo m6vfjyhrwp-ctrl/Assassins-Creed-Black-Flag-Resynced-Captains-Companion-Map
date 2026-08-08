@@ -1,13 +1,13 @@
 {
   "manifestVersion": 2,
-  "releaseVersion": "7.7.0",
-  "buildId": "animus-v7.7.0-phase-2-polish-sprint-1-20260728",
+  "releaseVersion": "7.7.2",
+  "buildId": "animus-v7.7.2-mayan-stones-20260808",
   "algorithm": "SHA-256",
   "files": [
     {
       "path": "index.html",
-      "size": 22069,
-      "sha256": "88fbb65dd893a8c2c92c04083c1c1bc55be1072aa71a995b5683fdec6730b284"
+      "size": 22567,
+      "sha256": "2250a41778baac795c002b30d5d054780c6dfc24fa3c5856f4aeb472e2266de9"
     },
     {
       "path": "styles.css",
@@ -21,8 +21,8 @@
     },
     {
       "path": "release-identity.js",
-      "size": 451,
-      "sha256": "72989199bf8a48b54b17b5c7223342046556537de92c211e209fd0c1283d869e"
+      "size": 430,
+      "sha256": "acb1bf5144936cda3ef955afd3a3f489cac2c2184f4075c3d560b241762fd380"
     },
     {
       "path": "integrity.js",
@@ -36,13 +36,13 @@
     },
     {
       "path": "database.js",
-      "size": 224243,
-      "sha256": "8883185e38810b0033d2ce43b0de02495a088aa2831fe4e17305947906a77bf0"
+      "size": 227668,
+      "sha256": "e0df749b5a0c82718fe3bf953b2a0ab2c5557c03c3d7cf5b6571d6f767f5e39d"
     },
     {
       "path": "app.js",
-      "size": 100447,
-      "sha256": "4d3aed10eb72192063d50416b8a3a1bd994791a2d1d6e752109151ab4f70b7ac"
+      "size": 101548,
+      "sha256": "84255f4ffb4316d0a91fb5ee82a0ebeac1cb27c40ce022fb43a7618d07dc7d26"
     },
     {
       "path": "developer-console.js",
@@ -87,7 +87,7 @@
     {
       "path": "manifest.webmanifest",
       "size": 678,
-      "sha256": "e93d65f7bb62747d3820ce9a549807323add4e7e9e67a5cd2665108775acaaa5"
+      "sha256": "a9bb79b81e12a74574ba7892bd8e98c52a24397bf3150da85b8bb87471e1cfff"
     },
     {
       "path": "icon-180.png",
@@ -106,13 +106,13 @@
     },
     {
       "path": "VERSION.json",
-      "size": 423,
-      "sha256": "32d11bc5fb00722e2e4333bda6fb74a04a23578e94dce2f22c88a8aa22126785"
+      "size": 365,
+      "sha256": "19a52fba8db5942e45b5510c502db4d4f3be1c2b629c5b3dcb87299d45753037"
     },
     {
       "path": "release-identity.json",
-      "size": 462,
-      "sha256": "508f35da76c2cb30e62bb5e8423d75a774ae32496a361ed9a8356e2e0c73e731"
+      "size": 441,
+      "sha256": "471d7a5011fc53769acfb1fc63f5596d80451d665ef0741d5665a5f569ed2c4d"
     }
   ]
 }

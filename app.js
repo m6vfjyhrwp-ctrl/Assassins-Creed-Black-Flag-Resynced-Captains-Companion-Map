@@ -971,8 +971,19 @@
   function renderFilterState() {
     ["hideCompleted", "favoritesOnly", "incompleteOnly", "discoveredOnly", "verifiedOnly", "legacyOnly"].forEach(key => $(key).checked = !!data.filters[key]);
   }
+
+  function renderMayanStones() {
+    const host = $("mayanStoneList"), summary = $("mayanStoneSummary");
+    if (!host || !summary) return;
+    const stones = locations.filter(l => l.type === "mayan-stone");
+    const done = stones.filter(l => data.completed[l.id]).length;
+    summary.innerHTML = `<div class="metric"><span>Collected</span><strong>${done} / ${stones.length}</strong></div><div class="metric"><span>Remaining</span><strong>${stones.length-done}</strong></div><div class="metric"><span>Reward</span><strong>${done===stones.length?'Unlocked':'Tulum'}</strong></div>`;
+    host.innerHTML = stones.map((l,i)=>`<button class="location-row" data-mayan-open="${l.id}"><span>${data.completed[l.id]?'✓':'◈'}</span><span><strong>${i+1}. ${esc(l.name)}</strong><small>${esc(l.region)} · ${data.completed[l.id]?'Collected':'Not collected'}</small></span><span class="coord">${esc(l.gameCoordinates)}</span></button>`).join('');
+    document.querySelectorAll('[data-mayan-open]').forEach(b=>b.onclick=()=>{switchTab('map');openLocation(b.dataset.mayanOpen,true)});
+  }
+
   function renderAll() {
-    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
+    renderCategoryControls(); renderQuickFilters(); renderRegionFilter(); renderFilterState(); renderOverview(); renderMayanStones(); renderIslandExplorer(); renderDirectory(); renderMarkers(); drawRoute(); renderJackdaw(); renderFleet(); renderProgress(); renderLog(); renderSettings(); renderRouteCandidateSummary(); renderNextObjective();
   }
 
   function switchTab(name) {

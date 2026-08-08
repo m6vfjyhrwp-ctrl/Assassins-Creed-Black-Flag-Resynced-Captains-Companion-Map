@@ -1,13 +1,13 @@
 {
-  "version": "7.7.0",
-  "name": "Phase 2 Polish \u2014 Interaction and Performance",
-  "databaseVersion": 9,
+  "version": "7.7.2",
+  "name": "Mayan Stones",
+  "databaseVersion": 10,
   "userDataVersion": 3,
   "storageKey": "acbf-companion-m3",
-  "released": "2026-07-28",
-  "buildId": "animus-v7.7.0-phase-2-polish-sprint-1-20260728",
+  "released": "2026-08-08",
+  "buildId": "animus-v7.7.2-mayan-stones-20260808",
   "releaseChannel": "production",
   "integrityManifestVersion": 2,
-  "buildDate": "2026-07-28",
-  "serviceWorkerCache": "acbf-v7.7.0-phase-2-polish-sprint-1"
+  "buildDate": "2026-08-08",
+  "serviceWorkerCache": "acbf-v7.7.2-mayan-stones"
 }

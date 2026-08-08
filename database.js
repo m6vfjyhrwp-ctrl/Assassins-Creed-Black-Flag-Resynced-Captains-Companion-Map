@@ -6536,3 +6536,49 @@ window.ACBF_LOCATIONS=[
     note: "104 backward-compatible production records audited for v5.1. Coverage certification applies only to categories already represented in the authoritative baseline."
   };
 })();
+
+
+// v7.7.2 — Resynced Mayan Stones collection.
+(() => {
+  window.ACBF_SOURCE_REGISTRY["gamespot-mayan-stelae-2026"] = {
+    basis: "Cross-Verified Community References",
+    title: "Black Flag Resynced Mayan Stelae Locations Guide",
+    url: "https://www.gamespot.com/articles/assassins-creed-black-flag-resynced-mayan-stelae-locations-guide/",
+    reviewed: "2026-08-08"
+  };
+  const stones = [
+    ["mayan-great-inagua-gibara","Great Inagua — Gibara",823,437,"Great Inagua","Story-linked: This Old Cove"],
+    ["mayan-cat-island-eleuthera","Cat Island — Eleuthera",703,670,"Cat Island","None known"],
+    ["mayan-matanzas","Matanzas",311,617,"Matanzas","None known"],
+    ["mayan-cape-bonavista","Cape Bonavista",159,584,"Cape Bonavista","None known"],
+    ["mayan-sacrifice-island","Sacrifice Island",18,548,"Sacrifice Island","None known"],
+    ["mayan-pinos-isle-1","Pinos Isle #1",303,452,"Pinos Isle","None known"],
+    ["mayan-pinos-isle-2","Pinos Isle #2",311,454,"Pinos Isle","None known"],
+    ["mayan-tulum","Tulum",30,382,"Tulum","None known"],
+    ["mayan-santanillas","Santanillas",187,221,"Santanillas","None known"],
+    ["mayan-misteriosa-1","Misteriosa #1",265,171,"Misteriosa","None known"],
+    ["mayan-misteriosa-2","Misteriosa #2",273,175,"Misteriosa","None known"],
+    ["mayan-new-bone","New Bone",400,92,"New Bone","None known"],
+    ["mayan-isla-providencia-1","Isla Providencia #1",485,25,"Isla Providencia","None known"],
+    ["mayan-isla-providencia-2","Isla Providencia #2",486,22,"Isla Providencia","None known"],
+    ["mayan-long-bay","Long Bay",502,216,"Long Bay","Late-story / Observatory access"],
+    ["mayan-tortuga","Tortuga",846,352,"Tortuga","None known"]
+  ].map(([id,name,x,y,region,storyRequirements]) => ({
+    id, name, type:"mayan-stone", icon:"◈", gameCoordinates:`${x}, ${y}`,
+    mapPosition:{x:x/10,y:100-y/10}, region, difficulty:"Exploration",
+    verification:"Resynced verified",
+    description:"Mayan Stela / Mayan Stone location in Assassin’s Creed IV: Black Flag Resynced. Solve the stela alignment puzzle to collect the stone.",
+    prerequisites:[storyRequirements === "None known" ? "Open-world access" : storyRequirements],
+    preparation:{minimum:["Reach the listed coordinates"],recommended:["Synchronize nearby viewpoints"],ideal:["Combine with nearby unfinished objectives"]},
+    checklist:["Reach the listed coordinates","Locate the Mayan Stela","Solve the alignment puzzle","Collect the Mayan Stone"],
+    recommendedTiers:{}, strategy:"Set a waypoint to the listed Resynced coordinates, locate the stela, interact with it, and align the highlighted shapes with the environment.",
+    rewards:["Mayan Stone progress toward the Tulum Mayan reward"], storyRequirements, nearby:[],
+    sourceNote:"Resynced Mayan Stela coordinate verified from the August 2026 GameSpot location guide.", sourceId:"gamespot-mayan-stelae-2026",
+    sourceBasis:"Cross-Verified Community References", lastReviewedVersion:"7.7.2"
+  }));
+  const existing = new Set(window.ACBF_LOCATIONS.map(x => x.id));
+  stones.forEach(x => { if (!existing.has(x.id)) window.ACBF_LOCATIONS.push(x); });
+  window.ACBF_DATABASE_VERSION = 10;
+  window.ACBF_DATABASE_META.version = 10;
+  window.ACBF_DATABASE_META.coverage = {records:window.ACBF_LOCATIONS.length,note:"Production database expanded with all 16 documented Black Flag Resynced Mayan Stela / Mayan Stone locations."};
+})();
